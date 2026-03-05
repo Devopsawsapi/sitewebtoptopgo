@@ -4,1160 +4,1111 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TopTopGo — Covoiturage Nouvelle Génération</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #F7F6F2;
-  --ink: #0C0C0B;
-  --blue: #0099EE;
-  --gold: #F0A500;
-  --line: rgba(12,12,11,.12);
-  --muted: #6B6B64;
-  --white: #FFFFFF;
-  --radius: 4px;
+:root{
+  --blue:#0099EE;
+  --blue-dark:#0077CC;
+  --blue-light:#E8F5FF;
+  --gold:#F0A500;
+  --gold-dark:#D4920A;
+  --gold-light:#FFF8E8;
+  --ink:#1A1A2E;
+  --text:#444;
+  --muted:#888;
+  --bg:#F8F9FA;
+  --white:#FFF;
+  --border:#E5E5E5;
+  --radius:8px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:16px}
-body{
-  font-family:'Manrope',sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  line-height:1.6;
-  overflow-x:hidden;
-}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden}
 
-/* ── CURSOR ── */
-body{cursor:none}
-.cursor{
-  width:10px;height:10px;border-radius:50%;
+/* ── TOP BAR ── */
+.topbar{
   background:var(--blue);
-  position:fixed;z-index:9999;
-  pointer-events:none;
-  transform:translate(-50%,-50%);
-  transition:width .2s,height .2s,background .2s;
+  padding:.55rem 5%;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.78rem;color:rgba(255,255,255,.9);
 }
-.cursor-ring{
-  width:36px;height:36px;border-radius:50%;
-  border:1px solid var(--ink);
-  position:fixed;z-index:9998;
-  pointer-events:none;
-  transform:translate(-50%,-50%);
-  transition:transform .1s,width .3s,height .3s;
-  opacity:.4;
+.topbar-left{display:flex;gap:2rem;align-items:center}
+.topbar-left span{display:flex;align-items:center;gap:.4rem}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.topbar-right a{
+  color:rgba(255,255,255,.8);text-decoration:none;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;transition:background .2s;
 }
+.topbar-right a:hover{background:rgba(255,255,255,.3)}
+.topbar-right .faq-link{
+  background:var(--gold);color:var(--white);
+  border-radius:50px;padding:.3rem .9rem;
+  font-weight:600;font-size:.72rem;width:auto;height:auto;
+}
+.topbar-right .faq-link:hover{background:var(--gold-dark)}
 
 /* ── NAV ── */
 nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 4%;height:68px;
-  background:rgba(247,246,242,.95);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
-}
-.logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:1.7rem;letter-spacing:.04em;
-  text-decoration:none;cursor:pointer;
-}
-.logo .t{color:var(--blue)}
-.logo .g{color:var(--gold)}
-.nav-links{display:flex;gap:2.5rem;list-style:none}
-.nav-links a{
-  font-size:.8rem;font-weight:600;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted);
-  text-decoration:none;cursor:pointer;
-  transition:color .2s;
-  position:relative;
-}
-.nav-links a.active,
-.nav-links a:hover{color:var(--ink)}
-.nav-links a::after{
-  content:'';position:absolute;bottom:-2px;left:0;
-  width:0;height:1px;background:var(--ink);
-  transition:width .3s;
-}
-.nav-links a:hover::after,
-.nav-links a.active::after{width:100%}
-.nav-btn{
-  font-family:'Manrope',sans-serif;
-  font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--white);background:var(--ink);
-  border:none;border-radius:var(--radius);
-  padding:.6rem 1.4rem;cursor:pointer;
-  transition:background .2s;
-}
-.nav-btn:hover{background:var(--blue)}
-.ham{display:none;flex-direction:column;gap:5px;cursor:pointer}
-.ham span{width:22px;height:1.5px;background:var(--ink);transition:all .3s;display:block}
-.ham.open span:nth-child(1){transform:rotate(45deg) translate(4px,4px)}
-.ham.open span:nth-child(2){opacity:0}
-.ham.open span:nth-child(3){transform:rotate(-45deg) translate(4px,-4px)}
-
-/* ── PAGES ── */
-.page{display:none;min-height:100vh;padding-top:68px}
-.page.active{display:block;animation:pageIn .5s ease}
-@keyframes pageIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-
-/* ── TYPOGRAPHY ── */
-.display{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(3.5rem,8vw,8rem);
-  line-height:.95;letter-spacing:-.02em;
-}
-.display em{font-style:italic;color:var(--blue)}
-.big-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(5rem,14vw,14rem);
-  line-height:1;letter-spacing:-.02em;
-  color:rgba(12,12,11,.06);
-  pointer-events:none;user-select:none;
-}
-.label{
-  font-size:.7rem;font-weight:700;letter-spacing:.15em;
-  text-transform:uppercase;color:var(--blue);
-  display:block;margin-bottom:.75rem;
-}
-.section-title{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(2rem,4vw,3.5rem);
-  line-height:1.05;letter-spacing:-.01em;
-}
-.section-title em{font-style:italic;color:var(--blue)}
-
-/* ── LINES ── */
-hr,.rule{border:none;border-top:1px solid var(--line);margin:0}
-.indent{padding:0 4%}
-
-/* ── HERO ── */
-.hero{
-  padding:0 4% 0;
-  min-height:calc(100vh - 68px);
-  display:grid;grid-template-rows:1fr auto;
-  border-bottom:1px solid var(--line);
-  position:relative;overflow:hidden;
-}
-.hero-body{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:end;
-  padding:6vh 0 4vh;
-  gap:2rem;
-}
-.hero-left{position:relative}
-.hero-left .big-num{
-  position:absolute;top:-1rem;left:-1rem;
-  z-index:0;
-}
-.hero-left .display{position:relative;z-index:1}
-.hero-right{
-  display:flex;flex-direction:column;
-  justify-content:flex-end;
-  padding-bottom:.5rem;
-}
-.hero-tagline{
-  font-size:1.05rem;font-weight:300;line-height:1.75;
-  color:var(--muted);max-width:420px;margin-bottom:2.5rem;
-}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap}
-.btn{
-  display:inline-flex;align-items:center;gap:.5rem;
-  font-family:'Manrope',sans-serif;
-  font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  padding:.8rem 1.8rem;border-radius:var(--radius);
-  cursor:pointer;text-decoration:none;border:none;
-  transition:all .25s;
-}
-.btn-dark{background:var(--ink);color:var(--white)}
-.btn-dark:hover{background:var(--blue)}
-.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-.btn-ghost:hover{border-color:var(--ink)}
-
-/* Hero stats bar */
-.hero-stats{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  border-top:1px solid var(--line);
-}
-.hero-stat{
-  padding:1.5rem 0;border-right:1px solid var(--line);
-}
-.hero-stat:last-child{border-right:none}
-.hs-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2.4rem;letter-spacing:.02em;
-  color:var(--ink);display:block;line-height:1;
-}
-.hs-lbl{font-size:.72rem;color:var(--muted);font-weight:500;margin-top:.3rem;display:block}
-
-/* ── SECTIONS ── */
-.section{padding:6rem 4%}
-.section-header{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:2rem;align-items:start;
-  padding-bottom:3rem;
-  border-bottom:1px solid var(--line);
-  margin-bottom:3rem;
-}
-.section-header.center{
-  grid-template-columns:1fr;text-align:center;
-  max-width:700px;margin:0 auto 3rem;
-  border-bottom:1px solid var(--line);
-  padding-bottom:3rem;
-}
-
-/* ── HOW IT WORKS ── */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-.step{
-  padding:3rem 3rem 3rem 0;
-  border-right:1px solid var(--line);
-  position:relative;
-}
-.step:last-child{border-right:none;padding-right:0;padding-left:3rem}
-.step:nth-child(2){padding-left:3rem}
-.step-n{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:4rem;color:rgba(12,12,11,.08);
-  line-height:1;display:block;margin-bottom:.75rem;
-}
-.step h3{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:.75rem;line-height:1.2}
-.step p{font-size:.88rem;color:var(--muted);line-height:1.75}
-
-/* ── SERVICES ── */
-.services-list{border-top:1px solid var(--line)}
-.svc{
-  display:grid;grid-template-columns:2fr 1fr 1fr auto;
-  align-items:center;gap:2rem;
-  padding:2rem 0;
-  border-bottom:1px solid var(--line);
-  transition:background .2s;
-  cursor:default;
-}
-.svc:hover .svc-name{color:var(--blue)}
-.svc-name{
-  font-family:'DM Serif Display',serif;
-  font-size:1.6rem;transition:color .2s;
-}
-.svc-for{font-size:.78rem;color:var(--muted);font-weight:500;letter-spacing:.05em}
-.svc-price{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2rem;color:var(--gold);letter-spacing:.03em;
-  text-align:right;
-}
-.svc-tags{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:flex-end}
-.tag{
-  font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--muted);border:1px solid var(--line);
-  border-radius:2px;padding:.25rem .65rem;
-}
-.svc-arr{
-  font-size:1.2rem;color:var(--line);
-  transition:transform .3s,color .3s;
-}
-.svc:hover .svc-arr{transform:translateX(6px);color:var(--blue)}
-
-/* ── TEAM ── */
-.team-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  border-top:1px solid var(--line);
-}
-.member{
-  padding:2.5rem 2rem 2.5rem 0;
-  border-right:1px solid var(--line);
-  position:relative;overflow:hidden;
-}
-.member:last-child{border-right:none}
-.member::before{
-  content:'';position:absolute;top:0;left:0;
-  width:0;height:2px;background:var(--blue);
-  transition:width .4s;
-}
-.member:hover::before{width:100%}
-.m-initial{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:3.5rem;line-height:1;
-  color:rgba(12,12,11,.07);
-  margin-bottom:1rem;display:block;
-}
-.m-name{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:.2rem}
-.m-role{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:.75rem;display:block}
-.m-bio{font-size:.82rem;color:var(--muted);line-height:1.7}
-
-/* ── ABOUT PULLQUOTE ── */
-.pullquote{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(1.8rem,3.5vw,3rem);
-  font-style:italic;line-height:1.3;
-  max-width:900px;letter-spacing:-.01em;
-}
-.pullquote span{color:var(--blue)}
-
-.values{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:0;margin-top:4rem;
-  border-top:1px solid var(--line);
-  border-left:1px solid var(--line);
-}
-.val{
-  padding:2rem;
-  border-right:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-}
-.val-n{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2.5rem;color:rgba(12,12,11,.07);
-  margin-bottom:.5rem;display:block;
-}
-.val h4{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:.5rem}
-.val p{font-size:.82rem;color:var(--muted);line-height:1.7}
-
-.timeline{margin-top:4rem}
-.tl{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-top:2px solid var(--ink)}
-.tl-item{padding:1.5rem 1.5rem 0 0;position:relative}
-.tl-item::before{
-  content:'';position:absolute;top:-2px;left:0;
-  width:0;height:2px;background:var(--blue);
-  transition:width .5s;
-}
-.tl-item:hover::before{width:100%}
-.tl-yr{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2.2rem;color:var(--ink);display:block;margin-bottom:.5rem;
-}
-.tl-item h4{font-size:.85rem;font-weight:700;margin-bottom:.4rem}
-.tl-item p{font-size:.78rem;color:var(--muted);line-height:1.65}
-
-/* ── IMPACT ── */
-.impact{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  border-top:1px solid var(--line);
-}
-.impact-item{
-  padding:4rem 3rem 4rem 0;
-  border-right:1px solid var(--line);
-}
-.impact-item:last-child{border-right:none}
-.impact-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:5rem;line-height:1;
-  display:block;color:var(--ink);margin-bottom:.5rem;
-}
-.impact-item h4{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:.5rem}
-.impact-item p{font-size:.85rem;color:var(--muted);line-height:1.7}
-
-/* ── TESTIMONIALS ── */
-.testis{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin-top:3rem}
-.testi{
-  padding:2.5rem 2.5rem 2.5rem 0;
-  border-right:1px solid var(--line);
-}
-.testi:last-child{border-right:none}
-.testi-stars{font-size:.8rem;color:var(--gold);letter-spacing:.1em;margin-bottom:1.2rem;display:block}
-.testi-q{
-  font-family:'DM Serif Display',serif;
-  font-style:italic;font-size:1rem;
-  line-height:1.7;color:var(--ink);margin-bottom:1.5rem;
-}
-.testi-who{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-
-/* ── CONTACT ── */
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line);margin-top:3rem}
-.contact-left{padding-right:4rem;border-right:1px solid var(--line)}
-.contact-right{padding-left:4rem}
-.contact-info-item{
-  padding:1.5rem 0;border-bottom:1px solid var(--line);
-  display:flex;align-items:flex-start;gap:1.5rem;
-}
-.ci-label{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);width:70px;flex-shrink:0;padding-top:.1rem}
-.ci-val{font-size:.92rem;font-weight:500}
-
-.fld{margin-bottom:1.5rem}
-.fld label{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.6rem}
-.fld input,.fld textarea,.fld select{
-  width:100%;background:transparent;
-  border:none;border-bottom:1px solid var(--line);
-  padding:.7rem 0;font-family:'Manrope',sans-serif;
-  font-size:.92rem;color:var(--ink);outline:none;
-  transition:border-color .2s;
-  border-radius:0;
-  -webkit-appearance:none;
-}
-.fld input:focus,.fld textarea:focus,.fld select:focus{border-bottom-color:var(--blue)}
-.fld textarea{min-height:100px;resize:none}
-.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
-.form-success{
-  display:none;padding:1rem;
-  border:1px solid rgba(0,180,80,.3);
-  color:#009950;font-size:.85rem;font-weight:600;
-  border-radius:var(--radius);margin-top:1rem;
-}
-
-/* ── FAQ ── */
-.faq{border-top:1px solid var(--line);margin-top:4rem}
-.faq-item{border-bottom:1px solid var(--line)}
-.faq-q{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:1.5rem 0;cursor:pointer;
-}
-.faq-q h4{font-family:'DM Serif Display',serif;font-size:1.05rem}
-.faq-icon{font-size:1.2rem;color:var(--muted);transition:transform .3s;line-height:1}
-.faq-item.open .faq-icon{transform:rotate(45deg)}
-.faq-a{display:none;padding-bottom:1.5rem}
-.faq-a p{font-size:.88rem;color:var(--muted);line-height:1.75;max-width:600px}
-
-/* ── CTA BAND ── */
-.cta-band{
-  margin:0 4% 6rem;
-  padding:5rem 4rem;
-  background:var(--ink);
-  border-radius:8px;
-  display:grid;grid-template-columns:1fr auto;
-  align-items:center;gap:3rem;
-}
-.cta-band h2{
-  font-family:'DM Serif Display',serif;
-  font-size:clamp(2rem,4vw,3.2rem);
-  color:var(--white);line-height:1.1;
-}
-.cta-band h2 em{font-style:italic;color:var(--gold)}
-
-/* ── SOCIALS FLOAT ── */
-.socials-float{
-  position:fixed;right:1.5rem;top:50%;
-  transform:translateY(-50%);z-index:90;
-  display:flex;flex-direction:column;gap:.4rem;
-}
-.sf-btn{
-  width:38px;height:38px;border-radius:var(--radius);
-  display:flex;align-items:center;justify-content:center;
-  text-decoration:none;font-size:.7rem;font-weight:700;
-  transition:transform .2s,opacity .2s;
-  opacity:.7;
-}
-.sf-btn:hover{transform:translateX(-4px) scale(1.05);opacity:1}
-.sf-fb{background:#1877F2;color:#fff}
-.sf-wa{background:#25D366;color:#fff}
-.sf-tt{background:#010101;color:#fff}
-.sf-ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);color:#fff}
-.sf-li{background:#0A66C2;color:#fff}
-
-/* ── FOOTER ── */
-footer{
-  background:var(--ink);
-  padding:4rem 4% 2rem;
-  color:rgba(255,255,255,.5);
-}
-.foot-top{
-  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
-  gap:3rem;padding-bottom:3rem;
-  border-bottom:1px solid rgba(255,255,255,.1);
-}
-.foot-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:2rem;letter-spacing:.04em;
-  display:block;margin-bottom:1rem;cursor:pointer;
-}
-.foot-logo .t{color:var(--blue)}
-.foot-logo .g{color:var(--gold)}
-.foot-desc{font-size:.82rem;line-height:1.7;max-width:260px}
-footer h5{font-size:.68rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:1.2rem}
-footer ul{list-style:none}
-footer ul li{margin-bottom:.6rem}
-footer ul li a{font-size:.82rem;color:rgba(255,255,255,.5);text-decoration:none;cursor:pointer;transition:color .2s}
-footer ul li a:hover{color:#fff}
-.foot-bottom{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-top:1.5rem;font-size:.75rem;flex-wrap:wrap;gap:.5rem;
-}
-.foot-socials{display:flex;gap:.5rem}
-.foot-socials a{
-  width:30px;height:30px;border-radius:2px;
-  background:rgba(255,255,255,.06);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.68rem;font-weight:700;color:rgba(255,255,255,.4);
-  text-decoration:none;transition:background .2s,color .2s;
-}
-.foot-socials a:hover{background:var(--blue);color:#fff}
-
-/* ── CHATBOT ── */
-.chat-btn{
-  position:fixed;bottom:2rem;left:2rem;z-index:300;
-  width:54px;height:54px;border-radius:50%;
-  background:var(--ink);border:none;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:1.2rem;
-  box-shadow:0 4px 24px rgba(12,12,11,.25);
-  transition:background .2s,transform .2s;
-}
-.chat-btn:hover{background:var(--blue);transform:scale(1.06)}
-.chat-btn.open{background:#c0392b}
-.chatbox{
-  position:fixed;bottom:6.5rem;left:2rem;z-index:299;
-  width:330px;
   background:var(--white);
-  border:1px solid var(--line);
-  border-radius:8px;
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  box-shadow:0 16px 60px rgba(12,12,11,.15);
-  opacity:0;transform:translateY(16px) scale(.97);
-  pointer-events:none;
-  transition:all .3s cubic-bezier(.4,0,.2,1);
+  padding:0 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  height:72px;
+  box-shadow:0 2px 12px rgba(0,0,0,.07);
+  position:sticky;top:0;z-index:200;
 }
-.chatbox.open{opacity:1;transform:none;pointer-events:all}
-.chat-head{
-  background:var(--ink);
-  padding:.9rem 1.2rem;
-  display:flex;align-items:center;gap:.8rem;
+.logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;cursor:pointer}
+.logo-icon{
+  width:48px;height:48px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;
 }
-.chat-av{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--blue);
+.logo-text{font-size:1.3rem;font-weight:800;color:var(--ink)}
+.logo-text span{color:var(--gold)}
+.logo-sub{font-size:.65rem;color:var(--muted);font-weight:400;display:block;margin-top:-.2rem}
+
+.nav-menu{display:flex;align-items:center;gap:.25rem;list-style:none}
+.nav-item{position:relative}
+.nav-item>a{
+  font-size:.83rem;font-weight:500;color:var(--text);
+  text-decoration:none;cursor:pointer;
+  padding:.5rem .9rem;border-radius:var(--radius);
+  display:flex;align-items:center;gap:.3rem;
+  transition:background .2s,color .2s;white-space:nowrap;
+}
+.nav-item>a:hover,.nav-item>a.active{background:var(--blue-light);color:var(--blue)}
+.nav-item>a.active{color:var(--blue);font-weight:600}
+.nav-arrow{font-size:.6rem;transition:transform .2s}
+.nav-item:hover .nav-arrow{transform:rotate(180deg)}
+
+/* Dropdown */
+.dropdown{
+  position:absolute;top:calc(100% + .5rem);left:0;
+  background:var(--white);border-radius:var(--radius);
+  box-shadow:0 8px 40px rgba(0,0,0,.12);
+  min-width:220px;padding:.5rem;
+  opacity:0;pointer-events:none;
+  transform:translateY(-8px);
+  transition:all .25s;z-index:300;
+  border:1px solid var(--border);
+}
+.nav-item:hover .dropdown{opacity:1;pointer-events:all;transform:none}
+.dropdown a{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.7rem 1rem;border-radius:6px;
+  font-size:.82rem;color:var(--text);
+  text-decoration:none;cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.dropdown a:hover{background:var(--blue-light);color:var(--blue)}
+.dropdown-icon{
+  width:30px;height:30px;border-radius:6px;
+  background:var(--blue-light);color:var(--blue);
   display:flex;align-items:center;justify-content:center;
   font-size:.9rem;flex-shrink:0;
 }
-.chat-head h4{font-size:.85rem;font-weight:700;color:#fff}
-.chat-head span{font-size:.7rem;color:rgba(255,255,255,.5)}
-.chat-msgs{
-  flex:1;max-height:280px;overflow-y:auto;
-  padding:.9rem;display:flex;flex-direction:column;gap:.6rem;
-  scrollbar-width:none;
-}
-.msg{max-width:88%;padding:.55rem .9rem;font-size:.83rem;line-height:1.5;border-radius:6px;animation:mIn .2s ease}
-@keyframes mIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.msg.bot{background:var(--bg);color:var(--ink);border-bottom-left-radius:2px;align-self:flex-start}
-.msg.user{background:var(--ink);color:#fff;border-bottom-right-radius:2px;align-self:flex-end}
-.chat-qr{display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem .9rem;border-top:1px solid var(--line)}
-.qr{
-  font-size:.72rem;font-weight:600;letter-spacing:.04em;
-  background:var(--bg);border:1px solid var(--line);
-  border-radius:2px;padding:.3rem .75rem;cursor:pointer;
-  transition:background .2s,border-color .2s;color:var(--ink);
-}
-.qr:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
-.chat-inp{
-  display:flex;gap:.5rem;padding:.65rem;
-  border-top:1px solid var(--line);
-}
-.chat-inp input{
-  flex:1;background:var(--bg);border:none;border-radius:var(--radius);
-  padding:.55rem .8rem;font-family:'Manrope',sans-serif;font-size:.82rem;
-  color:var(--ink);outline:none;
-}
-.chat-send{
-  width:34px;height:34px;border-radius:var(--radius);
-  background:var(--ink);border:none;color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:.85rem;transition:background .2s;
-}
-.chat-send:hover{background:var(--blue)}
+.dropdown-icon.gold{background:var(--gold-light);color:var(--gold-dark)}
 
-/* ── PAGE HEADER ── */
-.page-hdr{
-  padding:5rem 4% 4rem;
-  border-bottom:1px solid var(--line);
-  display:grid;grid-template-columns:1fr 1fr;
-  align-items:end;gap:2rem;
+.nav-cta{
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  color:var(--white);border:none;border-radius:50px;
+  padding:.6rem 1.5rem;font-family:'Poppins',sans-serif;
+  font-size:.8rem;font-weight:700;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(240,165,0,.35);
+  text-decoration:none;
 }
-.page-hdr p{color:var(--muted);font-size:.95rem;line-height:1.75;max-width:420px}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(240,165,0,.45)}
+
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none}
+.ham span{width:22px;height:2px;background:var(--ink);display:block;transition:all .3s}
+.ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ── HERO SLIDER ── */
+.hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#EBF6FF 0%,#FFF8E8 60%,#FFF 100%);
+  min-height:520px;
+}
+.slide{
+  display:none;min-height:520px;
+  padding:0 5%;
+  align-items:center;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  position:relative;
+}
+.slide.active{display:grid}
+.slide-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--blue-light) 0%,rgba(255,255,255,0) 60%);
+  z-index:0;
+}
+.slide-content{position:relative;z-index:1;padding:4rem 0}
+.slide-label{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--gold-light);border:1px solid rgba(240,165,0,.3);
+  color:var(--gold-dark);border-radius:50px;
+  padding:.35rem 1rem;font-size:.75rem;font-weight:600;
+  margin-bottom:1.5rem;
+}
+.slide-label span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.slide-content h1{
+  font-size:clamp(2rem,4vw,3rem);font-weight:800;
+  color:var(--ink);line-height:1.15;margin-bottom:1rem;
+}
+.slide-content h1 span{color:var(--blue)}
+.slide-content h1 em{font-style:normal;color:var(--gold)}
+.slide-content p{font-size:.95rem;color:var(--muted);line-height:1.75;max-width:480px;margin-bottom:2rem}
+.slide-btns{display:flex;gap:.9rem;flex-wrap:wrap}
+.btn-blue{
+  background:var(--blue);color:var(--white);border:none;
+  border-radius:50px;padding:.75rem 1.8rem;
+  font-family:'Poppins',sans-serif;font-size:.82rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 18px rgba(0,153,238,.3);
+}
+.btn-blue:hover{background:var(--blue-dark);transform:translateY(-2px)}
+.btn-outline-blue{
+  background:transparent;color:var(--blue);
+  border:2px solid var(--blue);border-radius:50px;
+  padding:.75rem 1.8rem;font-family:'Poppins',sans-serif;
+  font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.btn-outline-blue:hover{background:var(--blue);color:var(--white)}
+
+.slide-visual{
+  position:relative;z-index:1;
+  display:flex;align-items:flex-end;justify-content:center;
+  height:420px;
+}
+/* Person illustration via CSS */
+.person{
+  position:relative;
+  width:260px;height:380px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.person-circle{
+  width:220px;height:220px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  position:absolute;bottom:80px;
+  opacity:.12;
+}
+.person-emoji{
+  font-size:10rem;line-height:1;
+  position:absolute;bottom:60px;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,.15));
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+.float-card{
+  position:absolute;
+  background:var(--white);border-radius:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,.12);
+  padding:.8rem 1.1rem;
+  display:flex;align-items:center;gap:.6rem;
+  animation:float 4s ease-in-out infinite;
+}
+.float-card.card1{top:40px;right:-20px;animation-delay:-.5s}
+.float-card.card2{top:160px;left:-30px;animation-delay:-1s}
+.float-card.card3{bottom:20px;right:0;animation-delay:-1.5s}
+.fc-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+}
+.fc-icon.blue{background:var(--blue-light)}
+.fc-icon.gold{background:var(--gold-light)}
+.fc-icon.green{background:#E8FFF0}
+.fc-text h5{font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.1rem}
+.fc-text span{font-size:.68rem;color:var(--muted)}
+
+/* Slider controls */
+.slider-dots{
+  position:absolute;bottom:1.5rem;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:.5rem;
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(0,153,238,.25);cursor:pointer;transition:all .3s;
+  border:none;
+}
+.dot.active{background:var(--blue);width:24px;border-radius:4px}
+.slider-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;border-radius:50%;
+  background:var(--white);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1rem;color:var(--ink);
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+  transition:background .2s,color .2s;z-index:10;
+}
+.slider-arrow:hover{background:var(--blue);color:var(--white);border-color:var(--blue)}
+.slider-arrow.prev{left:2%}
+.slider-arrow.next{right:2%}
+
+/* ── STATS BAND ── */
+.stats-band{
+  background:var(--blue);
+  padding:2.5rem 5%;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+}
+.stat-item{
+  text-align:center;
+  border-right:1px solid rgba(255,255,255,.2);
+  padding:0 1rem;
+}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-size:2.2rem;font-weight:800;
+  color:var(--white);display:block;line-height:1;margin-bottom:.3rem;
+}
+.stat-num span{color:var(--gold)}
+.stat-lbl{font-size:.75rem;color:rgba(255,255,255,.75);font-weight:400}
+
+/* ── SECTIONS ── */
+.section{padding:5rem 5%}
+.section.gray{background:var(--bg)}
+.section.blue-bg{background:var(--blue-light)}
+
+.sec-head{text-align:center;margin-bottom:3.5rem}
+.sec-head .badge{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:var(--gold-light);color:var(--gold-dark);
+  border-radius:50px;padding:.35rem 1rem;
+  font-size:.73rem;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;margin-bottom:1rem;
+}
+.sec-head h2{
+  font-size:clamp(1.7rem,3vw,2.5rem);font-weight:800;
+  color:var(--ink);line-height:1.15;
+}
+.sec-head h2 span{color:var(--blue)}
+.sec-head h2 em{font-style:normal;color:var(--gold)}
+.sec-head p{color:var(--muted);font-size:.92rem;line-height:1.75;max-width:580px;margin:.8rem auto 0}
+
+/* ── HOW ── */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.how-card{
+  background:var(--white);border-radius:16px;
+  padding:2.5rem 2rem;text-align:center;
+  border:1px solid var(--border);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+  position:relative;overflow:hidden;
+}
+.how-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--blue),var(--blue-dark));
+  transform:scaleX(0);transition:transform .3s;transform-origin:left;
+}
+.how-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.1);border-color:rgba(0,153,238,.2)}
+.how-card:hover::before{transform:scaleX(1)}
+.how-num{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:var(--white);font-size:1.2rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 1.5rem;
+  box-shadow:0 6px 20px rgba(0,153,238,.35);
+}
+.how-card h3{font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.how-card p{font-size:.85rem;color:var(--muted);line-height:1.7}
+
+/* ── SERVICES ── */
+.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.svc-card{
+  background:var(--white);border-radius:16px;
+  padding:2rem;display:flex;gap:1.5rem;align-items:flex-start;
+  border:1px solid var(--border);
+  transition:transform .3s,box-shadow .3s,border-color .3s;
+}
+.svc-card:hover{transform:translateY(-4px);box-shadow:0 12px 35px rgba(0,0,0,.1);border-color:var(--blue)}
+.svc-icon{
+  width:60px;height:60px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+}
+.svc-icon.blue{background:var(--blue-light)}
+.svc-icon.gold{background:var(--gold-light)}
+.svc-body h3{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.4rem}
+.svc-body p{font-size:.83rem;color:var(--muted);line-height:1.7;margin-bottom:.8rem}
+.svc-price{
+  display:inline-block;
+  background:var(--blue-light);color:var(--blue-dark);
+  border-radius:50px;padding:.25rem .8rem;
+  font-size:.75rem;font-weight:700;
+}
+.svc-price.gold-p{background:var(--gold-light);color:var(--gold-dark)}
+
+/* ── TEAM ── */
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.team-card{
+  background:var(--white);border-radius:16px;
+  padding:2rem 1.5rem;text-align:center;
+  border:1px solid var(--border);
+  transition:transform .3s,box-shadow .3s;
+}
+.team-card:hover{transform:translateY(-6px);box-shadow:0 14px 35px rgba(0,0,0,.1)}
+.team-av{
+  width:80px;height:80px;border-radius:50%;
+  margin:0 auto 1.1rem;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  border:3px solid var(--border);
+  position:relative;
+}
+.team-av::after{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  border:2px solid transparent;
+  background:linear-gradient(135deg,var(--blue),var(--gold)) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;mask-composite:exclude;
+}
+.team-card h3{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+.team-card .role{font-size:.73rem;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.7rem;display:block}
+.team-card p{font-size:.78rem;color:var(--muted);line-height:1.65}
+
+/* ── TESTIMONIALS ── */
+.testis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.testi-card{
+  background:var(--white);border-radius:16px;
+  padding:2rem;border:1px solid var(--border);
+  transition:transform .3s,box-shadow .3s;
+}
+.testi-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.09)}
+.testi-card .stars{color:var(--gold);font-size:.9rem;margin-bottom:1rem;letter-spacing:.05em}
+.testi-card p{font-size:.87rem;color:var(--text);line-height:1.75;font-style:italic;margin-bottom:1.2rem}
+.testi-author{display:flex;align-items:center;gap:.7rem}
+.testi-pic{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--blue-light);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;
+}
+.testi-name h5{font-size:.83rem;font-weight:700;color:var(--ink)}
+.testi-name span{font-size:.73rem;color:var(--muted)}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-visual{
+  border-radius:20px;overflow:hidden;
+  background:linear-gradient(135deg,var(--blue-light),var(--gold-light));
+  height:400px;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.about-visual .big-emoji{font-size:7rem;animation:float 4s ease-in-out infinite}
+.about-content .badge2{
+  display:inline-block;background:var(--blue-light);color:var(--blue-dark);
+  border-radius:50px;padding:.3rem .9rem;font-size:.73rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:1rem;
+}
+.about-content h2{font-size:clamp(1.7rem,3vw,2.4rem);font-weight:800;color:var(--ink);line-height:1.2;margin-bottom:1rem}
+.about-content h2 span{color:var(--blue)}
+.about-content p{font-size:.9rem;color:var(--muted);line-height:1.8;margin-bottom:1rem}
+.about-vals{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+.val-item{background:var(--bg);border-radius:10px;padding:1rem;display:flex;gap:.8rem;align-items:flex-start}
+.val-icon{font-size:1.2rem;flex-shrink:0;margin-top:.1rem}
+.val-item h4{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:.2rem}
+.val-item p{font-size:.75rem;color:var(--muted);line-height:1.6}
+
+.timeline-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-top:3rem}
+.tl-item{
+  background:var(--white);border-radius:12px;
+  border:1px solid var(--border);padding:1.5rem;
+  border-top:3px solid var(--blue);text-align:center;
+  transition:transform .3s,box-shadow .3s;
+}
+.tl-item:hover{transform:translateY(-4px);box-shadow:0 10px 25px rgba(0,0,0,.08)}
+.tl-year{font-size:1.4rem;font-weight:800;color:var(--blue);display:block;margin-bottom:.4rem}
+.tl-item h4{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:.3rem}
+.tl-item p{font-size:.75rem;color:var(--muted);line-height:1.6}
+
+/* ── CONTACT ── */
+.contact-wrapper{display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:start}
+.contact-info-box{background:var(--blue);border-radius:20px;padding:2.5rem;color:var(--white)}
+.contact-info-box h3{font-size:1.4rem;font-weight:700;margin-bottom:.5rem}
+.contact-info-box>p{font-size:.87rem;color:rgba(255,255,255,.75);margin-bottom:2rem;line-height:1.7}
+.ci-row{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.3rem}
+.ci-icon{
+  width:42px;height:42px;border-radius:10px;flex-shrink:0;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+}
+.ci-row h5{font-size:.73rem;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
+.ci-row p{font-size:.88rem;color:var(--white);font-weight:500}
+.contact-socials{display:flex;gap:.6rem;margin-top:2rem}
+.cs-btn{
+  width:38px;height:38px;border-radius:8px;
+  background:rgba(255,255,255,.15);color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;text-decoration:none;
+  transition:background .2s;
+}
+.cs-btn:hover{background:var(--gold)}
+
+.contact-form-box{
+  background:var(--white);border-radius:20px;
+  padding:2.5rem;border:1px solid var(--border);
+  box-shadow:0 8px 30px rgba(0,0,0,.06);
+}
+.contact-form-box h3{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:1.5rem}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.f-group{margin-bottom:1.2rem}
+.f-group label{font-size:.73rem;font-weight:700;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:.5rem}
+.f-group input,.f-group textarea,.f-group select{
+  width:100%;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:8px;padding:.7rem 1rem;
+  font-family:'Poppins',sans-serif;font-size:.85rem;color:var(--ink);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+  -webkit-appearance:none;
+}
+.f-group input:focus,.f-group textarea:focus,.f-group select:focus{
+  border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,153,238,.12);
+}
+.f-group textarea{min-height:110px;resize:none}
+.f-btn{
+  width:100%;background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:var(--white);border:none;border-radius:50px;
+  padding:.85rem;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 16px rgba(0,153,238,.35);
+}
+.f-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,153,238,.45)}
+.f-success{
+  display:none;margin-top:1rem;padding:.9rem 1.1rem;
+  background:#E8FFF0;border:1px solid #A3E9BE;
+  border-radius:8px;color:#157A45;font-size:.83rem;font-weight:600;
+}
+
+/* ── FAQ ── */
+.faq-wrap{max-width:720px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.2rem 0;cursor:pointer;
+}
+.faq-q h4{font-size:.92rem;font-weight:600;color:var(--ink);padding-right:1rem}
+.faq-icon{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:var(--blue-light);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;font-weight:700;transition:all .3s;
+}
+.faq-item.open .faq-icon{background:var(--blue);color:var(--white);transform:rotate(45deg)}
+.faq-a{display:none;padding-bottom:1.2rem}
+.faq-a p{font-size:.85rem;color:var(--muted);line-height:1.75;max-width:640px}
+
+/* ── CTA ── */
+.cta-section{
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  padding:5rem 5%;text-align:center;position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.cta-section::after{
+  content:'';position:absolute;bottom:-60px;left:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+}
+.cta-section h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;color:var(--white);line-height:1.15;margin-bottom:.8rem;position:relative;z-index:1}
+.cta-section h2 em{font-style:normal;color:var(--gold)}
+.cta-section p{font-size:.93rem;color:rgba(255,255,255,.8);margin-bottom:2rem;position:relative;z-index:1}
+.cta-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  color:var(--white);border:none;border-radius:50px;
+  padding:.8rem 2rem;font-family:'Poppins',sans-serif;
+  font-size:.85rem;font-weight:700;cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 4px 18px rgba(240,165,0,.45);
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,165,0,.55)}
+.btn-white-outline{
+  background:transparent;color:var(--white);
+  border:2px solid rgba(255,255,255,.5);border-radius:50px;
+  padding:.8rem 2rem;font-family:'Poppins',sans-serif;
+  font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.btn-white-outline:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.8)}
+
+/* ── SOCIALS FLOAT ── */
+.socials-side{
+  position:fixed;right:1rem;top:50%;transform:translateY(-50%);
+  z-index:190;display:flex;flex-direction:column;gap:.4rem;
+}
+.ss-btn{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;text-decoration:none;color:var(--white);
+  transition:transform .2s,opacity .2s;opacity:.85;
+}
+.ss-btn:hover{transform:scale(1.1) translateX(-4px);opacity:1}
+.ss-fb{background:#1877F2}
+.ss-wa{background:#25D366}
+.ss-tt{background:#010101}
+.ss-ig{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888)}
+.ss-li{background:#0A66C2}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);padding:4rem 5% 2rem;color:rgba(255,255,255,.5)}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.foot-logo{font-size:1.6rem;font-weight:800;color:var(--white);display:block;margin-bottom:.8rem;cursor:pointer}
+.foot-logo em{font-style:normal;color:var(--gold)}
+.foot-desc{font-size:.82rem;line-height:1.75;max-width:250px;margin-bottom:1.5rem}
+.foot-social{display:flex;gap:.5rem}
+.foot-social a{
+  width:34px;height:34px;border-radius:6px;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;text-decoration:none;
+  transition:background .2s,color .2s;
+}
+.foot-social a:hover{background:var(--blue);color:var(--white)}
+footer h5{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1rem}
+footer ul{list-style:none}
+footer ul li{margin-bottom:.6rem}
+footer ul li a{font-size:.82rem;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:color .2s}
+footer ul li a:hover{color:var(--white)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:2rem;border-top:1px solid rgba(255,255,255,.08);font-size:.75rem;flex-wrap:wrap;gap:.5rem}
+
+/* ── CHATBOT ── */
+.chat-fab{
+  position:fixed;bottom:2rem;left:2rem;z-index:300;
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;color:var(--white);
+  box-shadow:0 6px 25px rgba(0,153,238,.4);
+  transition:all .25s;
+}
+.chat-fab:hover{transform:scale(1.08)}
+.chat-fab.open{background:linear-gradient(135deg,#e74c3c,#c0392b)}
+.chatbox{
+  position:fixed;bottom:6.5rem;left:2rem;z-index:299;
+  width:340px;background:var(--white);
+  border:1px solid var(--border);border-radius:16px;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 16px 50px rgba(0,0,0,.14);
+  opacity:0;transform:scale(.94) translateY(16px);
+  pointer-events:none;transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+.chatbox.open{opacity:1;transform:none;pointer-events:all}
+.chat-head{
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  padding:1rem 1.2rem;display:flex;align-items:center;gap:.8rem;
+}
+.chat-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.chat-head-txt h4{font-size:.88rem;font-weight:700;color:var(--white)}
+.chat-head-txt span{font-size:.7rem;color:rgba(255,255,255,.7)}
+.chat-msgs{max-height:280px;overflow-y:auto;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;scrollbar-width:none}
+.cmsg{max-width:88%;padding:.6rem .9rem;border-radius:10px;font-size:.83rem;line-height:1.5;animation:mIn .2s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.cmsg.bot{background:var(--bg);color:var(--ink);border-bottom-left-radius:2px;align-self:flex-start}
+.cmsg.user{background:var(--blue);color:var(--white);border-bottom-right-radius:2px;align-self:flex-end}
+.chat-qr{display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem .9rem;border-top:1px solid var(--border)}
+.qr{font-size:.73rem;font-weight:600;background:var(--blue-light);border:none;border-radius:50px;padding:.3rem .8rem;cursor:pointer;color:var(--blue-dark);transition:background .2s}
+.qr:hover{background:var(--blue);color:var(--white)}
+.chat-inp-row{display:flex;gap:.5rem;padding:.65rem;border-top:1px solid var(--border)}
+.chat-inp-row input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:50px;padding:.55rem .9rem;font-family:'Poppins',sans-serif;font-size:.82rem;color:var(--ink);outline:none}
+.chat-inp-row input:focus{border-color:var(--blue)}
+.chat-inp-row button{width:34px;height:34px;border-radius:50%;background:var(--blue);border:none;color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.chat-inp-row button:hover{background:var(--blue-dark)}
 
 /* ── REVEAL ── */
-.reveal{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
-.reveal.vis{opacity:1;transform:none}
+.rev{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.rev.vis{opacity:1;transform:none}
 
 /* ── RESPONSIVE ── */
+@media(max-width:1024px){.team-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){
-  .nav-links,.nav-btn{display:none}
+  .nav-menu,.nav-cta{display:none}
   .ham{display:flex}
-  .nav-links.mob{
-    display:flex;flex-direction:column;
-    position:fixed;inset:0;top:68px;
-    background:var(--white);z-index:99;
-    align-items:center;justify-content:center;gap:2rem;
+  .nav-menu.mob{
+    display:flex;flex-direction:column;gap:.25rem;
+    position:fixed;inset:0;top:72px;background:var(--white);
+    padding:2rem 5%;z-index:199;overflow-y:auto;
   }
-  .nav-links.mob a{font-size:1.3rem}
-  .hero-body{grid-template-columns:1fr;padding-top:4vh}
-  .hero-stats{grid-template-columns:repeat(2,1fr)}
-  .steps,.team-grid,.impact,.testis,.tl{grid-template-columns:1fr}
-  .step,.member,.impact-item,.testi,.tl-item{border-right:none;padding-right:0;border-bottom:1px solid var(--line)}
-  .step:nth-child(2){padding-left:0}
-  .contact-grid{grid-template-columns:1fr}
-  .contact-left{padding-right:0;border-right:none;padding-bottom:3rem;border-bottom:1px solid var(--line)}
-  .contact-right{padding-left:0}
-  .section-header{grid-template-columns:1fr}
-  .svc{grid-template-columns:1fr auto;grid-template-rows:auto auto}
-  .svc-for,.svc-price{display:none}
-  .cta-band{grid-template-columns:1fr;gap:2rem}
-  .values{grid-template-columns:1fr 1fr}
-  .foot-top{grid-template-columns:1fr 1fr}
-  .page-hdr{grid-template-columns:1fr}
-  .socials-float{display:none}
-  .fld-row{grid-template-columns:1fr}
+  .nav-menu.mob .nav-item>a{font-size:1rem;padding:.8rem 1rem}
+  .dropdown{position:static;opacity:1;pointer-events:all;transform:none;box-shadow:none;border:1px solid var(--border);margin-top:.5rem}
+  .slide{grid-template-columns:1fr}
+  .slide-visual{display:none}
+  .stats-band{grid-template-columns:repeat(2,1fr)}
+  .stat-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:1.5rem;margin-bottom:1.5rem}
+  .how-grid,.services-grid,.testis-grid{grid-template-columns:1fr}
+  .about-grid{grid-template-columns:1fr}
+  .timeline-row{grid-template-columns:repeat(2,1fr)}
+  .contact-wrapper{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .topbar{display:none}
+  .socials-side{display:none}
+  .f-row{grid-template-columns:1fr}
 }
 @media(max-width:500px){
-  .hero-stats{grid-template-columns:1fr 1fr}
-  .values{grid-template-columns:1fr}
+  .about-vals{grid-template-columns:1fr}
   .chatbox{width:calc(100vw - 2rem);left:1rem}
+  .timeline-row{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cur"></div>
-<div class="cursor-ring" id="curRing"></div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span>✉ contact@toptopgo.com</span>
+    <span>📍 Abidjan, Côte d'Ivoire</span>
+  </div>
+  <div class="topbar-right">
+    <a href="https://facebook.com" target="_blank">fb</a>
+    <a href="https://twitter.com" target="_blank">tw</a>
+    <a href="https://instagram.com" target="_blank">ig</a>
+    <a href="https://linkedin.com" target="_blank">in</a>
+    <a href="#" class="faq-link" onclick="go('contact');return false">FAQs</a>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav>
-  <div class="logo" onclick="go('home')"><span class="t">TopTop</span><span class="g">Go</span></div>
-  <ul class="nav-links" id="navLinks">
-    <li><a onclick="go('home')" data-p="home" class="active">Accueil</a></li>
-    <li><a onclick="go('team')" data-p="team">Notre Équipe</a></li>
-    <li><a onclick="go('services')" data-p="services">Services</a></li>
-    <li><a onclick="go('about')" data-p="about">À Propos</a></li>
-    <li><a onclick="go('contact')" data-p="contact">Contact</a></li>
+  <div class="logo" onclick="go('home')">
+    <div class="logo-icon">🚗</div>
+    <div>
+      <div class="logo-text">TopTop<span>Go</span></div>
+      <span class="logo-sub">Covoiturage Premium</span>
+    </div>
+  </div>
+
+  <ul class="nav-menu" id="navMenu">
+    <li class="nav-item"><a onclick="go('home')" data-p="home" class="active">Accueil</a></li>
+    <li class="nav-item"><a onclick="go('team')" data-p="team">Qui Sommes-Nous</a></li>
+    <li class="nav-item">
+      <a data-p="services">Nos Services <span class="nav-arrow">▾</span></a>
+      <div class="dropdown">
+        <a onclick="go('services')"><div class="dropdown-icon">🚗</div><div><strong>Covoiturage Quotidien</strong><br><small>Dès 3€ le trajet</small></div></a>
+        <a onclick="go('services')"><div class="dropdown-icon gold">🏢</div><div><strong>TopTopGo Business</strong><br><small>Pour entreprises</small></div></a>
+        <a onclick="go('services')"><div class="dropdown-icon">✈️</div><div><strong>Transferts Aéroport</strong><br><small>Dès 15€</small></div></a>
+        <a onclick="go('services')"><div class="dropdown-icon gold">🎓</div><div><strong>Offre Étudiante</strong><br><small>9,90€ / mois</small></div></a>
+      </div>
+    </li>
+    <li class="nav-item"><a onclick="go('about')" data-p="about">À Propos</a></li>
+    <li class="nav-item"><a onclick="go('contact')" data-p="contact">Nous Contacter</a></li>
   </ul>
-  <button class="nav-btn" onclick="go('contact')">Nous contacter</button>
-  <div class="ham" id="ham" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+
+  <a class="nav-cta" onclick="go('contact')">Réserver maintenant</a>
+  <button class="ham" id="ham" onclick="toggleMenu()"><span></span><span></span><span></span></button>
 </nav>
 
 <!-- ══════════ ACCUEIL ══════════ -->
 <div class="page active" id="page-home">
 
-  <section class="hero">
-    <div class="hero-body">
-      <div class="hero-left">
-        <div class="big-num">01</div>
-        <div class="display">
-          Partager<br>la route,<br><em>réduire</em><br>les coûts.
+  <!-- HERO SLIDER -->
+  <div class="hero">
+    <div class="slide active" id="slide-0">
+      <div class="slide-bg"></div>
+      <div class="slide-content">
+        <div class="slide-label"><span></span> N°1 du Covoiturage Premium</div>
+        <h1>Partager la route,<br><span>réduire</span> les coûts,<br><em>voyager mieux.</em></h1>
+        <p>TopTopGo connecte conducteurs et passagers pour des trajets sûrs, économiques et responsables. Où que vous alliez, partez ensemble.</p>
+        <div class="slide-btns">
+          <button class="btn-blue" onclick="go('services')">Nos offres →</button>
+          <button class="btn-outline-blue" onclick="go('about')">Qui sommes-nous ?</button>
         </div>
       </div>
-      <div class="hero-right">
-        <p class="hero-tagline">TopTopGo est la plateforme de covoiturage qui connecte conducteurs et passagers pour des trajets sûrs, ponctuels et économiques — partout où vous avez besoin d'aller.</p>
-        <div class="hero-ctas">
-          <button class="btn btn-dark" onclick="go('services')">Découvrir nos offres →</button>
-          <button class="btn btn-ghost" onclick="go('about')">Notre histoire</button>
+      <div class="slide-visual">
+        <div class="person">
+          <div class="person-circle"></div>
+          <div class="person-emoji">🧑‍✈️</div>
+        </div>
+        <div class="float-card card1"><div class="fc-icon blue">🛡️</div><div class="fc-text"><h5>Sécurité vérifiée</h5><span>100% des membres</span></div></div>
+        <div class="float-card card2"><div class="fc-icon gold">⭐</div><div class="fc-text"><h5>Note 4.9/5</h5><span>50 000 avis</span></div></div>
+        <div class="float-card card3"><div class="fc-icon green">💰</div><div class="fc-text"><h5>Économisez 75%</h5><span>vs taxi classique</span></div></div>
+      </div>
+    </div>
+    <div class="slide" id="slide-1">
+      <div class="slide-bg" style="background:linear-gradient(135deg,var(--gold-light),rgba(255,255,255,0) 60%)"></div>
+      <div class="slide-content">
+        <div class="slide-label" style="background:var(--blue-light);color:var(--blue-dark);border-color:rgba(0,153,238,.3)"><span style="background:var(--blue)"></span> Pour les entreprises</div>
+        <h1>La mobilité de vos<br><span>collaborateurs</span>,<br><em>optimisée.</em></h1>
+        <p>TopTopGo Business offre à vos équipes une solution de transport partagé avec tableau de bord, bilan carbone et facturation centralisée.</p>
+        <div class="slide-btns">
+          <button class="btn-blue" onclick="go('services')">Découvrir l'offre →</button>
+          <button class="btn-outline-blue" onclick="go('contact')">Demander un devis</button>
         </div>
       </div>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat indent"><span class="hs-num">50 000</span><span class="hs-lbl">Membres actifs</span></div>
-      <div class="hero-stat indent"><span class="hs-num">200+</span><span class="hs-lbl">Villes couvertes</span></div>
-      <div class="hero-stat indent"><span class="hs-num">2 M+</span><span class="hs-lbl">Trajets effectués</span></div>
-      <div class="hero-stat indent"><span class="hs-num">4.9 / 5</span><span class="hs-lbl">Satisfaction client</span></div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <div class="section-header">
-      <div>
-        <span class="label">Comment ça marche</span>
-        <div class="section-title">Trois étapes.<br><em>Un trajet.</em></div>
-      </div>
-      <p style="color:var(--muted);font-size:.93rem;line-height:1.8;align-self:end">Rejoindre TopTopGo prend moins de deux minutes. Créez votre profil, trouvez ou proposez un trajet, voyagez l'esprit léger.</p>
-    </div>
-    <div class="steps">
-      <div class="step">
-        <span class="step-n">01</span>
-        <h3>Créez votre profil</h3>
-        <p>Inscrivez-vous gratuitement en moins de deux minutes. Votre identité est vérifiée, votre confiance est garantie dès le départ.</p>
-      </div>
-      <div class="step">
-        <span class="step-n">02</span>
-        <h3>Trouvez ou proposez</h3>
-        <p>Recherchez un trajet selon votre destination et votre date, ou publiez le vôtre avec vos disponibilités et votre tarif.</p>
-      </div>
-      <div class="step">
-        <span class="step-n">03</span>
-        <h3>Voyagez et évaluez</h3>
-        <p>Rejoignez-vous au point de départ convenu. Après le trajet, laissez un avis et contribuez à la confiance de la communauté.</p>
+      <div class="slide-visual">
+        <div class="person">
+          <div class="person-circle" style="background:linear-gradient(135deg,var(--gold),var(--gold-dark))"></div>
+          <div class="person-emoji">👩‍💼</div>
+        </div>
+        <div class="float-card card1"><div class="fc-icon gold">📊</div><div class="fc-text"><h5>Dashboard RH</h5><span>Suivi en temps réel</span></div></div>
+        <div class="float-card card2"><div class="fc-icon blue">🌿</div><div class="fc-text"><h5>Bilan CO₂</h5><span>-2500T émises</span></div></div>
+        <div class="float-card card3"><div class="fc-icon green">🏷️</div><div class="fc-text"><h5>Tarifs groupés</h5><span>Sur devis</span></div></div>
       </div>
     </div>
-  </section>
-
-  <section class="section reveal" style="background:var(--white);margin:0;padding:5rem 4%">
-    <div class="section-header">
-      <div>
-        <span class="label">Ce que disent nos membres</span>
-        <div class="section-title">Ils ont choisi<br><em>TopTopGo.</em></div>
+    <div class="slide" id="slide-2">
+      <div class="slide-bg" style="background:linear-gradient(135deg,#E8FFF0,rgba(255,255,255,0) 60%)"></div>
+      <div class="slide-content">
+        <div class="slide-label" style="background:#E8FFF0;color:#157A45;border-color:rgba(21,122,69,.3)"><span style="background:#157A45"></span> Offre étudiante</div>
+        <h1>La mobilité sans<br>se ruiner,<br><em>enfin.</em></h1>
+        <p>Trajets illimités, tarifs réduits, réseau campus. TopTopGo Student est conçu pour les 18-26 ans qui veulent bouger librement.</p>
+        <div class="slide-btns">
+          <button class="btn-blue" onclick="go('services')">Voir l'offre student →</button>
+          <button class="btn-outline-blue" onclick="go('contact')">En savoir plus</button>
+        </div>
+      </div>
+      <div class="slide-visual">
+        <div class="person">
+          <div class="person-circle" style="background:linear-gradient(135deg,#00C864,#009950)"></div>
+          <div class="person-emoji">🧑‍🎓</div>
+        </div>
+        <div class="float-card card1"><div class="fc-icon blue">🎓</div><div class="fc-text"><h5>Campus connectés</h5><span>Réseau national</span></div></div>
+        <div class="float-card card2"><div class="fc-icon gold">📱</div><div class="fc-text"><h5>App mobile</h5><span>iOS & Android</span></div></div>
+        <div class="float-card card3"><div class="fc-icon green">💳</div><div class="fc-text"><h5>9,90€ / mois</h5><span>Trajets illimités</span></div></div>
       </div>
     </div>
-    <div class="testis">
-      <div class="testi">
-        <span class="testi-stars">★ ★ ★ ★ ★</span>
-        <p class="testi-q">« Je fais le trajet Abidjan–Bouaké chaque semaine. Depuis que j'utilise TopTopGo, je dépense moitié moins et je rencontre des gens formidables. »</p>
-        <span class="testi-who">Kofi A. — Consultant, Abidjan</span>
-      </div>
-      <div class="testi">
-        <span class="testi-stars">★ ★ ★ ★ ★</span>
-        <p class="testi-q">« En tant qu'étudiante, c'est la solution idéale. L'application est claire, les conducteurs sont fiables et les tarifs sont vraiment accessibles. »</p>
-        <span class="testi-who">Aminata D. — Étudiante, Yamoussoukro</span>
-      </div>
-      <div class="testi">
-        <span class="testi-stars">★ ★ ★ ★ ★</span>
-        <p class="testi-q">« Je propose des trajets le week-end. Mes frais d'essence sont entièrement couverts et j'ai même un petit bénéfice. Je recommande sans hésiter. »</p>
-        <span class="testi-who">Thierry M. — Conducteur régulier, San-Pédro</span>
-      </div>
+    <button class="slider-arrow prev" onclick="prevSlide()">‹</button>
+    <button class="slider-arrow next" onclick="nextSlide()">›</button>
+    <div class="slider-dots">
+      <button class="dot active" onclick="goSlide(0)"></button>
+      <button class="dot" onclick="goSlide(1)"></button>
+      <button class="dot" onclick="goSlide(2)"></button>
     </div>
-  </section>
-
-  <div class="cta-band reveal">
-    <h2>Prêt à prendre<br>la route <em>ensemble ?</em></h2>
-    <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3);white-space:nowrap" onclick="go('contact')">Nous rejoindre →</button>
   </div>
 
+  <!-- STATS BAND -->
+  <div class="stats-band">
+    <div class="stat-item"><span class="stat-num">50<span>K+</span></span><span class="stat-lbl">Membres actifs</span></div>
+    <div class="stat-item"><span class="stat-num">200<span>+</span></span><span class="stat-lbl">Villes couvertes</span></div>
+    <div class="stat-item"><span class="stat-num">2<span>M+</span></span><span class="stat-lbl">Trajets effectués</span></div>
+    <div class="stat-item"><span class="stat-num">4.9<span>/5</span></span><span class="stat-lbl">Satisfaction client</span></div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="section rev">
+    <div class="sec-head">
+      <div class="badge">✦ Comment ça marche</div>
+      <h2>Simple en <span>3 étapes</span></h2>
+      <p>Rejoindre TopTopGo prend moins de 2 minutes. Voici comment fonctionne la plateforme du premier trajet à l'arrivée.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-num">1</div><h3>Créez votre profil</h3><p>Inscrivez-vous gratuitement, vérifiez votre identité et complétez votre profil en moins de deux minutes. Bienvenue dans la communauté !</p></div>
+      <div class="how-card"><div class="how-num">2</div><h3>Trouvez ou proposez</h3><p>Recherchez un trajet disponible selon votre destination et vos dates, ou publiez le vôtre avec vos horaires et votre tarif par place.</p></div>
+      <div class="how-card"><div class="how-num">3</div><h3>Voyagez & évaluez</h3><p>Rejoignez-vous au point de départ convenu, voyagez sereinement et laissez un avis pour aider la communauté à grandir.</p></div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="section gray rev">
+    <div class="sec-head">
+      <div class="badge">★ Témoignages</div>
+      <h2>Ils font confiance à <em>TopTopGo</em></h2>
+      <p>Des milliers de membres partagent leur expérience chaque jour. Voici quelques-uns de leurs retours.</p>
+    </div>
+    <div class="testis-grid">
+      <div class="testi-card"><div class="stars">★★★★★</div><p>« Je fais Abidjan–Bouaké chaque lundi. Depuis TopTopGo, je dépense deux fois moins et je rencontre des gens formidables. Un vrai changement de vie. »</p><div class="testi-author"><div class="testi-pic">👨‍💼</div><div class="testi-name"><h5>Kofi Asante</h5><span>Consultant, Abidjan</span></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><p>« En tant qu'étudiante, c'est la solution idéale. Les conducteurs sont ponctuels, l'application est claire et les tarifs sont vraiment accessibles. »</p><div class="testi-author"><div class="testi-pic">👩‍🎓</div><div class="testi-name"><h5>Aminata Diallo</h5><span>Étudiante, Yamoussoukro</span></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><p>« Je propose des trajets le week-end et mes frais d'essence sont entièrement couverts. Simple, fiable, je recommande sans hésiter à tous les conducteurs. »</p><div class="testi-author"><div class="testi-pic">🚗</div><div class="testi-name"><h5>Thierry Mensah</h5><span>Conducteur, San-Pédro</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section rev">
+    <h2>Prêt à prendre<br>la route <em>ensemble ?</em></h2>
+    <p>Inscrivez-vous gratuitement et profitez de votre premier trajet offert.</p>
+    <div class="cta-btns">
+      <button class="btn-gold" onclick="go('contact')">Commencer maintenant</button>
+      <button class="btn-white-outline" onclick="go('services')">Voir nos offres</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══════════ ÉQUIPE ══════════ -->
 <div class="page" id="page-team">
-  <div class="page-hdr">
-    <div>
-      <span class="label">Les personnes derrière TopTopGo</span>
-      <div class="display" style="font-size:clamp(2.5rem,5vw,5rem)">Notre<br><em>équipe</em></div>
+  <div class="cta-section" style="padding:4rem 5%;text-align:left;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2rem">
+    <div style="position:relative;z-index:1"><span style="font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6)">Les personnes derrière TopTopGo</span><h2 style="margin:0">Notre <em>équipe</em></h2></div>
+    <div style="position:relative;z-index:1;display:flex;gap:.5rem">
+      <button class="btn-gold" onclick="go('home')">← Accueil</button>
     </div>
-    <p>TopTopGo est né de l'ambition d'une équipe soudée autour d'une conviction commune : la mobilité partagée est l'avenir. Voici ceux qui la bâtissent chaque jour.</p>
   </div>
 
-  <section class="section reveal">
-    <span class="label">Direction</span>
-    <div class="team-grid" style="margin-top:2rem">
-      <div class="member">
-        <span class="m-initial">AT</span>
-        <div class="m-name">Amadou Traoré</div>
-        <span class="m-role">CEO & Co-fondateur</span>
-        <p class="m-bio">Entrepreneur passionné de mobilité urbaine. Après 10 ans dans le transport, il fonde TopTopGo avec la conviction que le covoiturage peut transformer les déplacements en Afrique.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">FD</span>
-        <div class="m-name">Fatima Diallo</div>
-        <span class="m-role">CTO & Co-fondatrice</span>
-        <p class="m-bio">Ingénieure full-stack formée à Paris et Dakar. Elle pilote l'architecture technique de la plateforme et garantit une expérience fluide pour chaque utilisateur.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">KM</span>
-        <div class="m-name">Kevin Mensah</div>
-        <span class="m-role">Directeur Marketing</span>
-        <p class="m-bio">Expert en croissance digitale et stratégie de marque. Il a propulsé TopTopGo de 0 à 50 000 membres actifs en moins de deux ans.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">SN</span>
-        <div class="m-name">Sylvie Nkembo</div>
-        <span class="m-role">Directrice Juridique</span>
-        <p class="m-bio">Avocate spécialisée en droit du numérique. Elle assure la conformité réglementaire de TopTopGo dans chacun des 15 pays où nous opérons.</p>
-      </div>
+  <div class="section rev">
+    <div class="sec-head"><div class="badge">👥 Direction</div><h2>Les <span>fondateurs</span></h2><p>Une équipe soudée, animée par une conviction commune : la mobilité partagée est l'avenir des déplacements.</p></div>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-av">👨‍💼</div><h3>Amadou Traoré</h3><span class="role">CEO & Co-fondateur</span><p>10 ans d'expérience dans le transport et la tech. Visionnaire de la mobilité partagée en Afrique, il pilote la stratégie globale de TopTopGo.</p></div>
+      <div class="team-card"><div class="team-av">👩‍💻</div><h3>Fatima Diallo</h3><span class="role">CTO & Co-fondatrice</span><p>Ingénieure full-stack formée à Paris et Dakar. Architecte de la plateforme depuis le premier jour, garante de la performance technique.</p></div>
+      <div class="team-card"><div class="team-av">👨‍🎨</div><h3>Kevin Mensah</h3><span class="role">Directeur Marketing</span><p>Expert en croissance digitale et branding. Il a propulsé TopTopGo de 0 à 50 000 membres actifs en moins de deux ans.</p></div>
+      <div class="team-card"><div class="team-av">👩‍⚖️</div><h3>Sylvie Nkembo</h3><span class="role">Directrice Juridique</span><p>Avocate spécialisée en droit du numérique, elle assure la conformité dans les 15 pays où TopTopGo est présent.</p></div>
     </div>
-  </section>
-
-  <section class="section reveal" style="background:var(--white);margin:0;padding:5rem 4%">
-    <span class="label">Équipes opérationnelles</span>
-    <div class="team-grid" style="margin-top:2rem">
-      <div class="member">
-        <span class="m-initial">IC</span>
-        <div class="m-name">Ibrahim Coulibaly</div>
-        <span class="m-role">Responsable Sécurité</span>
-        <p class="m-bio">Garant de la sécurité des trajets et de la vérification des identités. Il supervise les protocoles de confiance sur l'ensemble de la plateforme.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">MT</span>
-        <div class="m-name">Mariame Touré</div>
-        <span class="m-role">Data & Produit</span>
-        <p class="m-bio">Analyste produit qui transforme les données en décisions. Elle optimise l'algorithme de mise en relation pour des trajets toujours mieux adaptés.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">RG</span>
-        <div class="m-name">Romaric Gbessi</div>
-        <span class="m-role">Support Client</span>
-        <p class="m-bio">Chef de l'équipe support, il s'assure qu'aucun membre ne reste sans réponse. Son équipe intervient en moins d'une heure sur tout incident signalé.</p>
-      </div>
-      <div class="member">
-        <span class="m-initial">NS</span>
-        <div class="m-name">Nadia Sow</div>
-        <span class="m-role">Partenariats B2B</span>
-        <p class="m-bio">Développe les accords stratégiques avec entreprises, collectivités et acteurs de la mobilité pour étendre la couverture et les services TopTopGo.</p>
-      </div>
-    </div>
-  </section>
-
-  <div class="cta-band reveal">
-    <h2>Rejoignez<br>une équipe <em>qui bouge.</em></h2>
-    <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3);white-space:nowrap" onclick="go('contact')">Postuler →</button>
   </div>
+
+  <div class="section gray rev">
+    <div class="sec-head"><div class="badge">⚙️ Opérations</div><h2>Équipes <span>opérationnelles</span></h2></div>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-av">🛡️</div><h3>Ibrahim Coulibaly</h3><span class="role">Sécurité & Confiance</span><p>Garant des protocoles de vérification d'identité et de la sécurité des trajets sur toute la plateforme.</p></div>
+      <div class="team-card"><div class="team-av">📊</div><h3>Mariame Touré</h3><span class="role">Data & Produit</span><p>Analyste qui transforme les données en décisions produit. Elle optimise l'algorithme de mise en relation.</p></div>
+      <div class="team-card"><div class="team-av">🎧</div><h3>Romaric Gbessi</h3><span class="role">Support Client</span><p>Son équipe garantit une réponse à chaque membre en moins d'une heure, 7 jours sur 7.</p></div>
+      <div class="team-card"><div class="team-av">🤝</div><h3>Nadia Sow</h3><span class="role">Partenariats B2B</span><p>Développe les accords stratégiques avec entreprises et collectivités pour étendre la couverture TopTopGo.</p></div>
+    </div>
+  </div>
+
+  <div class="cta-section rev"><h2>Rejoignez une équipe <em>qui bouge.</em></h2><p>Nous recrutons des talents passionnés pour notre mission.</p><div class="cta-btns"><button class="btn-gold" onclick="go('contact')">Postuler maintenant</button></div></div>
 </div>
 
 <!-- ══════════ SERVICES ══════════ -->
 <div class="page" id="page-services">
-  <div class="page-hdr">
-    <div>
-      <span class="label">Ce que nous proposons</span>
-      <div class="display" style="font-size:clamp(2.5rem,5vw,5rem)">Nos<br><em>services</em></div>
+  <div class="cta-section" style="padding:4rem 5%;text-align:left"><span style="font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);position:relative;z-index:1;display:block">Ce que nous proposons</span><h2 style="margin:0;position:relative;z-index:1">Nos <em>services</em></h2></div>
+
+  <div class="section rev">
+    <div class="sec-head"><div class="badge">🚗 Particuliers & Pro</div><h2>Des solutions pour <span>chaque profil</span></h2><p>Que vous soyez étudiant, salarié, voyageur ou dirigeant d'entreprise, TopTopGo a la bonne offre pour vous.</p></div>
+    <div class="services-grid">
+      <div class="svc-card"><div class="svc-icon blue">🚗</div><div class="svc-body"><h3>Covoiturage Quotidien</h3><p>Partagez votre trajet domicile-travail ou vos voyages longue distance. Économisez, réduisez votre empreinte carbone et rencontrez de nouvelles personnes.</p><span class="svc-price">Dès 3€ / trajet</span></div></div>
+      <div class="svc-card"><div class="svc-icon gold">🏢</div><div class="svc-body"><h3>TopTopGo Business</h3><p>Mobilité professionnelle pour vos collaborateurs. Tableau de bord RH, bilan CO₂ automatisé, facturation centralisée et tarifs préférentiels négociés.</p><span class="svc-price gold-p">Sur devis</span></div></div>
+      <div class="svc-card"><div class="svc-icon blue">✈️</div><div class="svc-body"><h3>Transferts Aéroport</h3><p>Transfert aéroport ou gare avec tarif fixe annoncé à l'avance. Conducteur ponctuel, aucune surprise, bagages inclus.</p><span class="svc-price">Dès 15€</span></div></div>
+      <div class="svc-card"><div class="svc-icon gold">🎓</div><div class="svc-body"><h3>Offre Étudiante</h3><p>Abonnement mensuel à tarif réduit avec accès au réseau campus. Trajets illimités, vérification étudiante, communauté dédiée.</p><span class="svc-price gold-p">9,90€ / mois</span></div></div>
     </div>
-    <p>Des solutions de mobilité partagée pensées pour chaque profil — particuliers, étudiants, professionnels et entreprises. Simples, fiables, accessibles.</p>
   </div>
 
-  <section class="section reveal">
-    <div class="services-list">
-      <div class="svc">
-        <div class="svc-name">Covoiturage Quotidien</div>
-        <div class="svc-for">Particuliers</div>
-        <div class="svc-price">Dès 3€</div>
-        <div class="svc-tags"><span class="tag">Assurance incluse</span><span class="tag">Paiement sécurisé</span><span class="tag">App mobile</span></div>
-        <span class="svc-arr">→</span>
-      </div>
-      <div class="svc">
-        <div class="svc-name">TopTopGo Business</div>
-        <div class="svc-for">Entreprises & PME</div>
-        <div class="svc-price">Sur devis</div>
-        <div class="svc-tags"><span class="tag">Tableau de bord RH</span><span class="tag">Bilan CO₂</span><span class="tag">Facturation centralisée</span></div>
-        <span class="svc-arr">→</span>
-      </div>
-      <div class="svc">
-        <div class="svc-name">Transferts Aéroport</div>
-        <div class="svc-for">Voyageurs</div>
-        <div class="svc-price">Dès 15€</div>
-        <div class="svc-tags"><span class="tag">Tarif fixe</span><span class="tag">Ponctualité garantie</span><span class="tag">Bagages inclus</span></div>
-        <span class="svc-arr">→</span>
-      </div>
-      <div class="svc">
-        <div class="svc-name">Offre Étudiante</div>
-        <div class="svc-for">18 – 26 ans</div>
-        <div class="svc-price">9,90€ / mois</div>
-        <div class="svc-tags"><span class="tag">Trajets illimités</span><span class="tag">Réseau campus</span><span class="tag">Tarifs réduits</span></div>
-        <span class="svc-arr">→</span>
-      </div>
+  <div class="section gray rev">
+    <div class="sec-head"><div class="badge">📱 Application mobile</div><h2>Tout dans <span>votre poche</span></h2><p>iOS & Android. L'application TopTopGo centralise recherche, réservation, paiement, suivi et évaluation en un seul endroit.</p></div>
+    <div class="how-grid">
+      <div class="how-card"><div class="how-num" style="background:linear-gradient(135deg,var(--gold),var(--gold-dark))">GPS</div><h3>Navigation temps réel</h3><p>Suivez votre trajet en direct, recevez les alertes de départ et échangez avec votre conducteur sans quitter l'app.</p></div>
+      <div class="how-card"><div class="how-num" style="background:linear-gradient(135deg,var(--gold),var(--gold-dark))">PAY</div><h3>Paiement sécurisé</h3><p>Règlement 100% en ligne. Le conducteur reçoit sa part automatiquement après confirmation d'arrivée à destination.</p></div>
+      <div class="how-card"><div class="how-num" style="background:linear-gradient(135deg,var(--gold),var(--gold-dark))">★</div><h3>Système de confiance</h3><p>Notes, avis et vérification d'identité pour chaque membre. La réputation se construit trajet après trajet.</p></div>
     </div>
-  </section>
-
-  <section class="section reveal" style="background:var(--white);margin:0;padding:5rem 4%">
-    <div class="section-header">
-      <div>
-        <span class="label">Fonctionnalités de l'application</span>
-        <div class="section-title">Tout dans<br><em>votre poche.</em></div>
-      </div>
-      <p style="color:var(--muted);font-size:.93rem;line-height:1.8;align-self:end">Disponible sur iOS et Android, l'application TopTopGo centralise tout : recherche, réservation, paiement, suivi et évaluation.</p>
-    </div>
-    <div class="steps">
-      <div class="step"><span class="step-n">GPS</span><h3>Navigation temps réel</h3><p>Suivez votre trajet en direct, recevez les alertes de départ et communiquez avec votre conducteur ou passager sans quitter l'app.</p></div>
-      <div class="step"><span class="step-n">PAY</span><h3>Paiement intégré</h3><p>Règlement 100 % en ligne, sécurisé. Le conducteur reçoit sa part automatiquement après confirmation d'arrivée.</p></div>
-      <div class="step"><span class="step-n">★</span><h3>Système de confiance</h3><p>Notes, avis et vérification d'identité pour chaque membre. La réputation se construit trajet après trajet.</p></div>
-    </div>
-  </section>
-
-  <div class="cta-band reveal">
-    <h2>Vous êtes une<br><em>entreprise ?</em></h2>
-    <button class="btn btn-ghost" style="color:#fff;border-color:rgba(255,255,255,.3);white-space:nowrap" onclick="go('contact')">Demander un devis →</button>
   </div>
+
+  <div class="cta-section rev"><h2>Vous êtes une <em>entreprise ?</em></h2><p>Notre équipe commerciale vous prépare un devis personnalisé TopTopGo Business.</p><div class="cta-btns"><button class="btn-gold" onclick="go('contact')">Demander un devis</button><button class="btn-white-outline" onclick="go('team')">Rencontrer l'équipe</button></div></div>
 </div>
 
 <!-- ══════════ À PROPOS ══════════ -->
 <div class="page" id="page-about">
-  <div class="page-hdr">
-    <div>
-      <span class="label">Notre histoire</span>
-      <div class="display" style="font-size:clamp(2.5rem,5vw,5rem)">À propos<br>de <em>nous</em></div>
+  <div class="cta-section" style="padding:4rem 5%;text-align:left"><span style="font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);position:relative;z-index:1;display:block">Notre histoire</span><h2 style="margin:0;position:relative;z-index:1">À propos <em>de nous</em></h2></div>
+
+  <div class="section rev">
+    <div class="about-grid">
+      <div class="about-visual"><div class="big-emoji">🌍</div></div>
+      <div class="about-content">
+        <span class="badge2">Notre mission</span>
+        <h2>Rendre la mobilité <span>accessible à tous</span></h2>
+        <p>TopTopGo est née en 2021 de la frustration de ses fondateurs face au coût exorbitant des transports et à la congestion urbaine croissante. Notre réponse : une plateforme de covoiturage fiable, sûre et accessible.</p>
+        <p>Aujourd'hui présente dans 15 pays, avec plus de 50 000 membres actifs et 2 millions de trajets partagés, TopTopGo est devenue la référence du covoiturage en Afrique de l'Ouest.</p>
+        <p>Nous sommes convaincus que la mobilité de demain sera partagée, durable et humaine. Et nous la construisons dès aujourd'hui.</p>
+        <div class="about-vals">
+          <div class="val-item"><div class="val-icon">🌿</div><div><h4>Durabilité</h4><p>Réduire l'empreinte carbone de chaque déplacement, trajet après trajet.</p></div></div>
+          <div class="val-item"><div class="val-icon">🛡️</div><div><h4>Confiance</h4><p>Vérification des identités, assurance et notation transparente pour tous.</p></div></div>
+          <div class="val-item"><div class="val-icon">💰</div><div><h4>Accessibilité</h4><p>Des tarifs conçus pour que personne ne renonce à se déplacer.</p></div></div>
+          <div class="val-item"><div class="val-icon">🤝</div><div><h4>Communauté</h4><p>La route se partage mieux à plusieurs. TopTopGo, c'est aussi des rencontres.</p></div></div>
+        </div>
+      </div>
     </div>
-    <p>Fondée en 2021, TopTopGo est née d'un constat simple : se déplacer coûte trop cher, pollue trop, et isole ceux qui n'ont pas les moyens d'une voiture. Nous avons décidé de changer ça.</p>
   </div>
 
-  <section class="section reveal">
-    <div class="pullquote">
-      « Nous ne construisons pas une application de plus. Nous bâtissons le réseau de mobilité <span>le plus accessible</span> d'Afrique. »
+  <div class="section gray rev">
+    <div class="sec-head"><div class="badge">📅 Chronologie</div><h2>Notre <span>parcours</span> depuis 2021</h2></div>
+    <div class="timeline-row">
+      <div class="tl-item"><span class="tl-year">2021</span><h4>Fondation</h4><p>Lancement beta avec 200 membres fondateurs dans 3 villes.</p></div>
+      <div class="tl-item"><span class="tl-year">2022</span><h4>Série A</h4><p>2,5 M€ levés. Recrutement de l'équipe technique.</p></div>
+      <div class="tl-item"><span class="tl-year">2023</span><h4>Expansion</h4><p>8 nouveaux pays. Lancement de l'app iOS & Android.</p></div>
+      <div class="tl-item"><span class="tl-year">2024</span><h4>Business</h4><p>Offre entreprise. 150 contrats signés en 6 mois.</p></div>
+      <div class="tl-item"><span class="tl-year">2025</span><h4>50 000 membres</h4><p>15 pays, 2M de trajets. Cap sur l'Europe.</p></div>
     </div>
+  </div>
 
-    <div class="values">
-      <div class="val"><span class="val-n">01</span><h4>Accessibilité</h4><p>Des tarifs conçus pour tous les budgets. Personne ne devrait renoncer à se déplacer faute de moyens.</p></div>
-      <div class="val"><span class="val-n">02</span><h4>Confiance</h4><p>Vérification des identités, assurance trajet, notation transparente. La sécurité n'est pas une option.</p></div>
-      <div class="val"><span class="val-n">03</span><h4>Durabilité</h4><p>Chaque voiture remplie, c'est plusieurs voitures en moins sur la route. L'impact est collectif.</p></div>
-      <div class="val"><span class="val-n">04</span><h4>Communauté</h4><p>TopTopGo, c'est aussi des rencontres, des liens. La route se partage mieux à plusieurs.</p></div>
+  <div class="section rev">
+    <div class="sec-head"><div class="badge">📊 Impact concret</div><h2>Des chiffres <span>qui parlent</span></h2></div>
+    <div class="stats-band" style="border-radius:16px;overflow:hidden">
+      <div class="stat-item"><span class="stat-num">2 500<span>T</span></span><span class="stat-lbl">de CO₂ évitées</span></div>
+      <div class="stat-item"><span class="stat-num">3,2<span>M€</span></span><span class="stat-lbl">économisés par nos membres</span></div>
+      <div class="stat-item"><span class="stat-num">4,8<span>M km</span></span><span class="stat-lbl">partagés sur la plateforme</span></div>
+      <div class="stat-item"><span class="stat-num">15<span> pays</span></span><span class="stat-lbl">couverts en Afrique</span></div>
     </div>
-  </section>
-
-  <section class="section reveal" style="background:var(--white);margin:0;padding:5rem 4%">
-    <span class="label">Chronologie</span>
-    <div class="timeline">
-      <div class="tl">
-        <div class="tl-item"><span class="tl-yr">2021</span><h4>Fondation</h4><p>Lancement de la beta avec 200 membres fondateurs dans 3 villes.</p></div>
-        <div class="tl-item"><span class="tl-yr">2022</span><h4>Série A</h4><p>Levée de fonds de 2,5 M€. Recrutement de l'équipe technique.</p></div>
-        <div class="tl-item"><span class="tl-yr">2023</span><h4>Expansion</h4><p>8 nouveaux pays, lancement de l'application mobile iOS & Android.</p></div>
-        <div class="tl-item"><span class="tl-yr">2024</span><h4>Business</h4><p>Lancement de l'offre entreprise. 150 contrats signés en 6 mois.</p></div>
-        <div class="tl-item"><span class="tl-yr">2025</span><h4>50 000 membres</h4><p>15 pays, 2 millions de trajets partagés. Cap sur l'Europe.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <span class="label">Notre impact concret</span>
-    <div class="impact">
-      <div class="impact-item">
-        <span class="impact-num">2 500 T</span>
-        <h4>de CO₂ évitées</h4>
-        <p>Grâce aux trajets partagés sur notre plateforme depuis 2021. L'équivalent de 500 voitures retirées de la circulation.</p>
-      </div>
-      <div class="impact-item">
-        <span class="impact-num">3,2 M€</span>
-        <h4>économisés</h4>
-        <p>Par nos membres sur leurs frais de transport. En moyenne, un utilisateur actif économise 180€ par mois.</p>
-      </div>
-      <div class="impact-item">
-        <span class="impact-num">4,8 M km</span>
-        <h4>partagés</h4>
-        <p>Soit 120 tours du monde. Chaque kilomètre partagé est un kilomètre qui profite à toute la communauté.</p>
-      </div>
-    </div>
-  </section>
+  </div>
 </div>
 
 <!-- ══════════ CONTACT ══════════ -->
 <div class="page" id="page-contact">
-  <div class="page-hdr">
-    <div>
-      <span class="label">On est là pour vous</span>
-      <div class="display" style="font-size:clamp(2.5rem,5vw,5rem)">Parlons<br><em>ensemble</em></div>
+  <div class="cta-section" style="padding:4rem 5%;text-align:left"><span style="font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);position:relative;z-index:1;display:block">On est là pour vous</span><h2 style="margin:0;position:relative;z-index:1">Nous <em>contacter</em></h2></div>
+
+  <div class="section rev">
+    <div class="contact-wrapper">
+      <div class="contact-info-box">
+        <h3>Parlons de votre projet</h3>
+        <p>Une question, un partenariat ou une demande de devis ? Notre équipe répond sous 24 heures.</p>
+        <div class="ci-row"><div class="ci-icon">📍</div><div><h5>Adresse</h5><p>123 Avenue de la Mobilité, Abidjan, Côte d'Ivoire</p></div></div>
+        <div class="ci-row"><div class="ci-icon">📞</div><div><h5>Téléphone</h5><p>+225 07 00 00 00 00</p></div></div>
+        <div class="ci-row"><div class="ci-icon">✉️</div><div><h5>Email</h5><p>contact@toptopgo.com</p></div></div>
+        <div class="ci-row"><div class="ci-icon">🕐</div><div><h5>Horaires</h5><p>Lun – Ven : 8h – 18h<br>Support en ligne 24h/24</p></div></div>
+        <div class="contact-socials">
+          <a href="https://facebook.com" target="_blank" class="cs-btn">fb</a>
+          <a href="https://wa.me/2250700000000" target="_blank" class="cs-btn">wa</a>
+          <a href="https://tiktok.com" target="_blank" class="cs-btn">tt</a>
+          <a href="https://instagram.com" target="_blank" class="cs-btn">ig</a>
+          <a href="https://linkedin.com" target="_blank" class="cs-btn">in</a>
+        </div>
+      </div>
+      <div class="contact-form-box">
+        <h3>✉️ Envoyer un message</h3>
+        <div class="f-row">
+          <div class="f-group"><label>Prénom</label><input type="text" id="cf-p" placeholder="Jean"/></div>
+          <div class="f-group"><label>Nom</label><input type="text" id="cf-n" placeholder="Dupont"/></div>
+        </div>
+        <div class="f-group"><label>Email</label><input type="email" id="cf-e" placeholder="jean@email.com"/></div>
+        <div class="f-group"><label>Objet</label>
+          <select id="cf-o"><option value="">Choisissez un objet</option><option>Information générale</option><option>Partenariat entreprise</option><option>Support technique</option><option>Presse & Médias</option><option>Candidature</option><option>Autre</option></select>
+        </div>
+        <div class="f-group"><label>Message</label><textarea id="cf-m" placeholder="Votre message…"></textarea></div>
+        <button class="f-btn" onclick="sendForm()">Envoyer le message →</button>
+        <div class="f-success" id="fOk">✓ Message envoyé ! Nous vous répondons sous 24h.</div>
+      </div>
     </div>
-    <p>Une question, un partenariat, une idée ou simplement l'envie d'en savoir plus ? Notre équipe répond sous 24 heures, toujours.</p>
   </div>
 
-  <section class="section reveal">
-    <div class="contact-grid">
-      <div class="contact-left">
-        <div class="contact-info-item">
-          <span class="ci-label">Adresse</span>
-          <span class="ci-val">123 Avenue de la Mobilité<br>Abidjan, Côte d'Ivoire</span>
-        </div>
-        <div class="contact-info-item">
-          <span class="ci-label">Téléphone</span>
-          <span class="ci-val">+225 07 00 00 00 00</span>
-        </div>
-        <div class="contact-info-item">
-          <span class="ci-label">Email</span>
-          <span class="ci-val">contact@toptopgo.com</span>
-        </div>
-        <div class="contact-info-item">
-          <span class="ci-label">Horaires</span>
-          <span class="ci-val">Lun – Ven, 8h à 18h<br>Support en ligne 24h/24</span>
-        </div>
-        <div class="contact-info-item" style="border-bottom:none">
-          <span class="ci-label">Réseaux</span>
-          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-            <a href="https://facebook.com" target="_blank" class="sf-btn sf-fb" style="position:static;opacity:1">fb</a>
-            <a href="https://wa.me/2250700000000" target="_blank" class="sf-btn sf-wa" style="position:static;opacity:1">wa</a>
-            <a href="https://tiktok.com" target="_blank" class="sf-btn sf-tt" style="position:static;opacity:1">tt</a>
-            <a href="https://instagram.com" target="_blank" class="sf-btn sf-ig" style="position:static;opacity:1">ig</a>
-            <a href="https://linkedin.com" target="_blank" class="sf-btn sf-li" style="position:static;opacity:1">in</a>
-          </div>
-        </div>
-      </div>
-      <div class="contact-right">
-        <span class="label">Envoyer un message</span>
-        <div class="fld-row">
-          <div class="fld"><label>Prénom</label><input type="text" id="cf-prenom" placeholder="Jean"/></div>
-          <div class="fld"><label>Nom</label><input type="text" id="cf-nom" placeholder="Dupont"/></div>
-        </div>
-        <div class="fld"><label>Email</label><input type="email" id="cf-email" placeholder="jean@email.com"/></div>
-        <div class="fld">
-          <label>Objet</label>
-          <select id="cf-objet">
-            <option value="">Choisissez un objet</option>
-            <option>Information générale</option>
-            <option>Partenariat entreprise</option>
-            <option>Support technique</option>
-            <option>Presse & Médias</option>
-            <option>Candidature</option>
-            <option>Autre</option>
-          </select>
-        </div>
-        <div class="fld"><label>Message</label><textarea id="cf-msg" placeholder="Votre message…"></textarea></div>
-        <button class="btn btn-dark" onclick="sendForm()" style="width:100%;justify-content:center">Envoyer →</button>
-        <div class="form-success" id="formOk">✓ Message envoyé — nous vous répondons sous 24h.</div>
-      </div>
+  <div class="section gray rev">
+    <div class="sec-head"><div class="badge">❓ FAQ</div><h2>Questions <span>fréquentes</span></h2></div>
+    <div class="faq-wrap">
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)"><h4>Comment créer un compte TopTopGo ?</h4><div class="faq-icon">+</div></div><div class="faq-a"><p>Téléchargez l'app iOS ou Android, entrez votre email ou numéro de téléphone, puis suivez les étapes de vérification d'identité. L'inscription est gratuite et prend moins de 2 minutes.</p></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)"><h4>Comment fonctionne le paiement ?</h4><div class="faq-icon">+</div></div><div class="faq-a"><p>Le paiement est 100% en ligne et sécurisé. Le conducteur reçoit sa participation automatiquement après la confirmation d'arrivée à destination.</p></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)"><h4>Suis-je assuré pendant le trajet ?</h4><div class="faq-icon">+</div></div><div class="faq-a"><p>Oui. Chaque trajet TopTopGo est couvert par notre assurance partenaire. En cas d'incident, notre support est disponible 24h/24.</p></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)"><h4>Comment proposer un trajet en tant que conducteur ?</h4><div class="faq-icon">+</div></div><div class="faq-a"><p>Dans l'app, choisissez « Proposer un trajet », renseignez votre itinéraire, vos horaires et votre tarif par place. Votre annonce est publiée instantanément.</p></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tFaq(this)"><h4>TopTopGo Business, c'est pour qui ?</h4><div class="faq-icon">+</div></div><div class="faq-a"><p>Pour toute entreprise souhaitant offrir à ses collaborateurs une solution de mobilité partagée avec suivi, reporting CO₂ et facturation centralisée. Contactez-nous pour un devis.</p></div></div>
     </div>
-
-    <div class="faq">
-      <span class="label" style="padding-top:3rem;display:block">Questions fréquentes</span>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)"><h4>Comment créer un compte TopTopGo ?</h4><span class="faq-icon">+</span></div>
-        <div class="faq-a"><p>Téléchargez l'application iOS ou Android, entrez votre numéro de téléphone ou email, puis suivez les étapes de vérification d'identité. C'est gratuit et prend moins de 2 minutes.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)"><h4>Comment fonctionne le paiement ?</h4><span class="faq-icon">+</span></div>
-        <div class="faq-a"><p>Le règlement s'effectue entièrement en ligne via notre système sécurisé. Le conducteur reçoit sa participation automatiquement après confirmation d'arrivée à destination.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)"><h4>Est-ce que je suis assuré pendant le trajet ?</h4><span class="faq-icon">+</span></div>
-        <div class="faq-a"><p>Oui. Chaque trajet TopTopGo est couvert par notre assurance partenaire. En cas d'incident, notre équipe support est disponible 24h/24.</p></div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)"><h4>Comment proposer un trajet en tant que conducteur ?</h4><span class="faq-icon">+</span></div>
-        <div class="faq-a"><p>Depuis l'app, choisissez "Proposer un trajet", renseignez votre itinéraire, vos horaires et votre tarif par place. Votre annonce est publiée instantanément.</p></div>
-      </div>
-    </div>
-  </section>
+  </div>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="foot-top">
+  <div class="foot-grid">
     <div>
-      <span class="foot-logo" onclick="go('home')"><span class="t">TopTop</span><span class="g">Go</span></span>
+      <span class="foot-logo" onclick="go('home')">TopTop<em>Go</em></span>
       <p class="foot-desc">La plateforme de covoiturage nouvelle génération. Sécurisée, accessible, responsable. Présente dans 15 pays.</p>
+      <div class="foot-social">
+        <a href="https://facebook.com" target="_blank">fb</a>
+        <a href="https://wa.me/2250700000000" target="_blank">wa</a>
+        <a href="https://tiktok.com" target="_blank">tt</a>
+        <a href="https://instagram.com" target="_blank">ig</a>
+        <a href="https://linkedin.com" target="_blank">in</a>
+      </div>
     </div>
-    <div>
-      <h5>Navigation</h5>
-      <ul>
-        <li><a onclick="go('home')">Accueil</a></li>
-        <li><a onclick="go('team')">Notre équipe</a></li>
-        <li><a onclick="go('services')">Services</a></li>
-        <li><a onclick="go('about')">À propos</a></li>
-        <li><a onclick="go('contact')">Contact</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5>Services</h5>
-      <ul>
-        <li><a onclick="go('services')">Covoiturage quotidien</a></li>
-        <li><a onclick="go('services')">TopTopGo Business</a></li>
-        <li><a onclick="go('services')">Transferts aéroport</a></li>
-        <li><a onclick="go('services')">Offre étudiante</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5>Légal</h5>
-      <ul>
-        <li><a href="#">Mentions légales</a></li>
-        <li><a href="#">Politique de confidentialité</a></li>
-        <li><a href="#">Conditions générales</a></li>
-      </ul>
-    </div>
+    <div><h5>Navigation</h5><ul><li><a onclick="go('home')">Accueil</a></li><li><a onclick="go('team')">Notre équipe</a></li><li><a onclick="go('services')">Services</a></li><li><a onclick="go('about')">À propos</a></li><li><a onclick="go('contact')">Contact</a></li></ul></div>
+    <div><h5>Services</h5><ul><li><a onclick="go('services')">Covoiturage quotidien</a></li><li><a onclick="go('services')">TopTopGo Business</a></li><li><a onclick="go('services')">Transferts aéroport</a></li><li><a onclick="go('services')">Offre étudiante</a></li></ul></div>
+    <div><h5>Légal</h5><ul><li><a href="#">Mentions légales</a></li><li><a href="#">Confidentialité</a></li><li><a href="#">CGU</a></li><li><a href="#">Cookies</a></li></ul></div>
   </div>
-  <div class="foot-bottom">
-    <span>© 2025 TopTopGo. Tous droits réservés.</span>
-    <div class="foot-socials">
-      <a href="https://facebook.com" target="_blank">fb</a>
-      <a href="https://wa.me/2250700000000" target="_blank">wa</a>
-      <a href="https://tiktok.com" target="_blank">tt</a>
-      <a href="https://instagram.com" target="_blank">ig</a>
-      <a href="https://linkedin.com" target="_blank">in</a>
-    </div>
-  </div>
+  <div class="foot-bottom"><span>© 2025 TopTopGo. Tous droits réservés.</span><span>Made with ❤️ en Afrique</span></div>
 </footer>
 
-<!-- SOCIALS FLOAT -->
-<div class="socials-float">
-  <a href="https://facebook.com" target="_blank" class="sf-btn sf-fb">fb</a>
-  <a href="https://wa.me/2250700000000" target="_blank" class="sf-btn sf-wa">wa</a>
-  <a href="https://tiktok.com" target="_blank" class="sf-btn sf-tt">tt</a>
-  <a href="https://instagram.com" target="_blank" class="sf-btn sf-ig">ig</a>
-  <a href="https://linkedin.com" target="_blank" class="sf-btn sf-li">in</a>
+<!-- SOCIALS SIDE -->
+<div class="socials-side">
+  <a href="https://facebook.com" target="_blank" class="ss-btn ss-fb">fb</a>
+  <a href="https://wa.me/2250700000000" target="_blank" class="ss-btn ss-wa">wa</a>
+  <a href="https://tiktok.com" target="_blank" class="ss-btn ss-tt">tt</a>
+  <a href="https://instagram.com" target="_blank" class="ss-btn ss-ig">ig</a>
+  <a href="https://linkedin.com" target="_blank" class="ss-btn ss-li">in</a>
 </div>
 
 <!-- CHATBOT -->
-<button class="chat-btn" id="chatBtn" onclick="toggleChat()">💬</button>
+<button class="chat-fab" id="chatFab" onclick="toggleChat()">💬</button>
 <div class="chatbox" id="chatbox">
   <div class="chat-head">
     <div class="chat-av">🚗</div>
-    <div><h4>Assistant TopTopGo</h4><span>● En ligne</span></div>
+    <div class="chat-head-txt"><h4>Assistant TopTopGo</h4><span>● En ligne maintenant</span></div>
   </div>
-  <div class="chat-msgs" id="chatMsgs">
-    <div class="msg bot">Bonjour ! Comment puis-je vous aider ?</div>
-  </div>
-  <div class="chat-qr" id="chatQR">
+  <div class="chat-msgs" id="cMsgs"><div class="cmsg bot">Bonjour ! 👋 Comment puis-je vous aider ?</div></div>
+  <div class="chat-qr" id="cQR">
     <div class="qr" onclick="qr('S\'inscrire')">S'inscrire</div>
     <div class="qr" onclick="qr('Tarifs')">Tarifs</div>
-    <div class="qr" onclick="qr('Comment ça marche ?')">Comment ça marche</div>
-    <div class="qr" onclick="qr('Aéroport')">Transfert aéroport</div>
+    <div class="qr" onclick="qr('Comment ça marche')">Comment ça marche</div>
+    <div class="qr" onclick="qr('Aéroport')">Aéroport</div>
   </div>
-  <div class="chat-inp">
-    <input id="chatIn" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter')sendChat()"/>
-    <button class="chat-send" onclick="sendChat()">→</button>
+  <div class="chat-inp-row">
+    <input id="cIn" placeholder="Votre message…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button onclick="sendChat()">→</button>
   </div>
 </div>
 
 <script>
-// ── CURSOR ──
-const cur = document.getElementById('cur');
-const curRing = document.getElementById('curRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
-(function animate(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;curRing.style.left=rx+'px';curRing.style.top=ry+'px';requestAnimationFrame(animate)})();
-
-// ── PAGES ──
+// PAGES
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.toggle('active',a.dataset.p===id));
+  document.querySelectorAll('.nav-menu a').forEach(a=>a.classList.toggle('active',a.dataset.p===id));
   window.scrollTo({top:0,behavior:'smooth'});
-  document.getElementById('navLinks').classList.remove('mob');
+  document.getElementById('navMenu').classList.remove('mob');
   document.getElementById('ham').classList.remove('open');
   setTimeout(initReveal,80);
 }
-
-// ── MENU ──
 function toggleMenu(){
   document.getElementById('ham').classList.toggle('open');
-  document.getElementById('navLinks').classList.toggle('mob');
+  document.getElementById('navMenu').classList.toggle('mob');
 }
 
-// ── REVEAL ──
+// SLIDER
+let cur=0;const total=3;
+function goSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n));
+  cur=n;
+}
+function nextSlide(){goSlide((cur+1)%total)}
+function prevSlide(){goSlide((cur-1+total)%total)}
+setInterval(nextSlide,5000);
+
+// REVEAL
 function initReveal(){
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target)}});
-  },{threshold:.08});
-  document.querySelectorAll('.reveal').forEach(el=>{el.classList.remove('vis');io.observe(el)});
+  const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');io.unobserve(x.target)}})},{threshold:.08});
+  document.querySelectorAll('.rev').forEach(el=>{el.classList.remove('vis');io.observe(el)});
 }
 initReveal();
 
-// ── FAQ ──
-function toggleFaq(el){
+// FAQ
+function tFaq(el){
   const item=el.parentElement;
-  const isOpen=item.classList.contains('open');
+  const open=item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(f=>{f.classList.remove('open');f.querySelector('.faq-a').style.display='none'});
-  if(!isOpen){item.classList.add('open');item.querySelector('.faq-a').style.display='block'}
+  if(!open){item.classList.add('open');item.querySelector('.faq-a').style.display='block'}
 }
 
-// ── CHATBOT ──
-const botR={
-  'inscrire':"Pour créer votre compte TopTopGo, téléchargez l'app (iOS/Android), entrez votre email ou numéro, puis vérifiez votre identité. C'est gratuit !",
-  'tarifs':"Covoiturage dès 3€/trajet. Offre étudiante à 9,90€/mois. Transferts aéroport dès 15€. Offre entreprise sur devis.",
-  'marche':"En 3 étapes : 1) Créez votre profil 2) Trouvez ou publiez un trajet 3) Voyagez et évaluez. Simple et rapide.",
-  'aéroport':"Nos transferts aéroport sont disponibles dès 15€. Tarif fixe, conducteur ponctuel, bagages inclus. Réservez via l'app.",
-  'sécurité':"Vérification d'identité obligatoire, assurance trajet incluse, système de notation communautaire. Votre sécurité est notre priorité.",
-  'def':"Merci pour votre message ! Pour une réponse personnalisée, contactez-nous via notre formulaire ou au +225 07 00 00 00 00."
+// CHATBOT
+const R={
+  i:"Pour vous inscrire, téléchargez l'app TopTopGo, entrez votre email/téléphone et vérifiez votre identité. C'est gratuit ! 🎉",
+  t:"Covoiturage dès 3€/trajet · Offre étudiante 9,90€/mois · Transfert aéroport dès 15€ · Business sur devis.",
+  c:"Simple en 3 étapes : 1) Créez votre profil 2) Trouvez ou publiez un trajet 3) Voyagez et évaluez !",
+  a:"Transferts aéroport dès 15€. Tarif fixe, conducteur ponctuel, bagages inclus. Réservez via l'app.",
+  d:"Merci ! Pour une réponse personnalisée, contactez-nous via le formulaire ou au +225 07 00 00 00 00."
 };
 function getR(m){
   const l=m.toLowerCase();
-  if(l.includes('inscri')||l.includes('compte')||l.includes('créer'))return botR.inscrire;
-  if(l.includes('tarif')||l.includes('prix')||l.includes('coût'))return botR.tarifs;
-  if(l.includes('march')||l.includes('comment')||l.includes('fonctionn'))return botR.marche;
-  if(l.includes('aéro')||l.includes('transfert'))return botR.aéroport;
-  if(l.includes('sécur')||l.includes('assur'))return botR.sécurité;
-  return botR.def;
+  if(l.includes('inscri')||l.includes('compte'))return R.i;
+  if(l.includes('tarif')||l.includes('prix')||l.includes('coût'))return R.t;
+  if(l.includes('march')||l.includes('comment')||l.includes('foncti'))return R.c;
+  if(l.includes('aéro')||l.includes('transfert'))return R.a;
+  return R.d;
 }
-function addMsg(t,c){
-  const m=document.createElement('div');
-  m.className='msg '+c;m.textContent=t;
-  document.getElementById('chatMsgs').appendChild(m);
-  document.getElementById('chatMsgs').scrollTop=99999;
-}
-function sendChat(){
-  const i=document.getElementById('chatIn'),v=i.value.trim();
-  if(!v)return;
-  addMsg(v,'user');i.value='';
-  document.getElementById('chatQR').style.display='none';
-  setTimeout(()=>addMsg(getR(v),'bot'),600);
-}
-function qr(t){addMsg(t,'user');document.getElementById('chatQR').style.display='none';setTimeout(()=>addMsg(getR(t),'bot'),600)}
-function toggleChat(){
-  const b=document.getElementById('chatbox'),btn=document.getElementById('chatBtn');
-  b.classList.toggle('open');btn.classList.toggle('open');
-  btn.textContent=b.classList.contains('open')?'✕':'💬';
-}
+function addMsg(t,c){const m=document.createElement('div');m.className='cmsg '+c;m.textContent=t;document.getElementById('cMsgs').appendChild(m);document.getElementById('cMsgs').scrollTop=99999}
+function sendChat(){const i=document.getElementById('cIn'),v=i.value.trim();if(!v)return;addMsg(v,'user');i.value='';document.getElementById('cQR').style.display='none';setTimeout(()=>addMsg(getR(v),'bot'),650)}
+function qr(t){addMsg(t,'user');document.getElementById('cQR').style.display='none';setTimeout(()=>addMsg(getR(t),'bot'),650)}
+function toggleChat(){const b=document.getElementById('chatbox'),btn=document.getElementById('chatFab');b.classList.toggle('open');btn.classList.toggle('open');btn.textContent=b.classList.contains('open')?'✕':'💬'}
 
-// ── FORM ──
-async function sendForm(){
-  const p=document.getElementById('cf-prenom').value.trim();
-  const e=document.getElementById('cf-email').value.trim();
-  const m=document.getElementById('cf-msg').value.trim();
+// FORM
+function sendForm(){
+  const p=document.getElementById('cf-p').value.trim();
+  const e=document.getElementById('cf-e').value.trim();
+  const m=document.getElementById('cf-m').value.trim();
   if(!p||!e||!m){alert('Veuillez remplir prénom, email et message.');return}
-  document.getElementById('formOk').style.display='block';
-  ['cf-prenom','cf-nom','cf-email','cf-msg'].forEach(id=>document.getElementById(id).value='');
-  setTimeout(()=>document.getElementById('formOk').style.display='none',5000);
+  document.getElementById('fOk').style.display='block';
+  ['cf-p','cf-n','cf-e','cf-m'].forEach(id=>document.getElementById(id).value='');
+  setTimeout(()=>document.getElementById('fOk').style.display='none',5000);
 }
 </script>
 </body>
