@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TopTopGo – Covoiturage Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #00AAFF;
+      --gold: #FFB800;
+      --dark: #080B10;
+      --dark2: #0E1318;
+      --dark3: #151C25;
+      --text: #E8EDF2;
+      --muted: #7A8896;
+      --border: rgba(0,170,255,0.15);
+      --radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 200px;
+      pointer-events: none;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 72px;
+      background: rgba(8,11,16,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: all .3s;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem; font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-logo span:first-child { color: var(--blue); }
+    .nav-logo span:last-child  { color: var(--gold); }
+
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem; font-weight: 500;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width .3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+    .nav-cta {
+      background: var(--gold); color: #000;
+      border: none; border-radius: 50px;
+      padding: .55rem 1.4rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: .85rem;
+      cursor: pointer; transition: transform .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,184,0,.35); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; z-index:200; }
+    .hamburger span { width: 24px; height: 2px; background: var(--text); transition: all .3s; display: block; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* ─── PAGES ─── */
+    .page { display: none; min-height: 100vh; padding-top: 72px; position: relative; z-index: 1; }
+    .page.active { display: block; animation: fadeIn .5s ease; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: none; } }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: calc(100vh - 72px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 4rem 5%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 70% 55% at 50% 40%, rgba(0,170,255,.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 30% at 80% 70%, rgba(255,184,0,.08) 0%, transparent 60%);
+    }
+
+    /* Road animation */
+    .road-lines {
+      position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 200px;
+      background: repeating-linear-gradient(to bottom, var(--gold) 0, var(--gold) 20px, transparent 20px, transparent 40px);
+      animation: road 1.2s linear infinite;
+      opacity: .3;
+    }
+    @keyframes road { from { background-position: 0 0; } to { background-position: 0 40px; } }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(0,170,255,.1); border: 1px solid rgba(0,170,255,.25);
+      border-radius: 50px; padding: .4rem 1.1rem;
+      font-size: .8rem; font-weight: 500; color: var(--blue);
+      margin-bottom: 2rem; z-index: 1;
+    }
+    .hero-tag span { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      font-weight: 800; line-height: 1.05;
+      z-index: 1; position: relative;
+    }
+    .hero h1 em { font-style: normal; color: var(--blue); }
+    .hero h1 strong { color: var(--gold); }
+
+    .hero-sub {
+      max-width: 560px; margin: 1.5rem auto 0;
+      color: var(--muted); font-size: 1.05rem; line-height: 1.7;
+      z-index: 1; position: relative;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; margin-top: 2.5rem;
+      flex-wrap: wrap; justify-content: center; z-index: 1; position: relative;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), #0088CC);
+      color: #fff; border: none; border-radius: 50px;
+      padding: .85rem 2.2rem;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem;
+      cursor: pointer; transition: all .25s;
+      box-shadow: 0 6px 30px rgba(0,170,255,.3);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,170,255,.45); }
+
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 50px; padding: .85rem 2.2rem;
+      font-family: 'Syne', sans-serif; font-weight: 600; font-size: .95rem;
+      cursor: pointer; transition: all .25s;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Stats */
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem;
+      z-index: 1; position: relative;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem; font-weight: 800; color: var(--blue);
+      display: block;
+    }
+    .stat-lbl { font-size: .8rem; color: var(--muted); font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
+
+    /* Cards grid */
+    .section { padding: 5rem 5%; }
+    .section-label {
+      font-size: .75rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800; line-height: 1.1;
+    }
+    .section-title em { font-style: normal; color: var(--blue); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+
+    .card {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: transform .3s, box-shadow .3s, border-color .3s;
+      cursor: default;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      border-color: rgba(0,170,255,.4);
+    }
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(0,170,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.25rem;
+    }
+    .card-icon.gold { background: rgba(255,184,0,.12); }
+    .card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem; font-weight: 700; margin-bottom: .6rem;
+    }
+    .card p { color: var(--muted); font-size: .9rem; line-height: 1.65; }
+
+    /* ─── TEAM PAGE ─── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .team-card {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      transition: transform .3s, border-color .3s;
+    }
+    .team-card:hover { transform: translateY(-6px); border-color: rgba(255,184,0,.4); }
+    .team-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      border: 2px solid var(--border);
+    }
+    .team-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+    .team-card .role { font-size: .82rem; color: var(--gold); font-weight: 500; margin-bottom: .8rem; }
+    .team-card p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── SERVICES PAGE ─── */
+    .service-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+      align-items: center; padding: 3.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .service-row:last-child { border-bottom: none; }
+    .service-row.reverse { direction: rtl; }
+    .service-row.reverse > * { direction: ltr; }
+    .service-visual {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      height: 260px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      position: relative; overflow: hidden;
+    }
+    .service-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,170,255,.08), transparent 70%);
+    }
+    .service-content h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.7rem; font-weight: 800; margin-bottom: .8rem;
+    }
+    .service-content p { color: var(--muted); line-height: 1.75; margin-bottom: 1.2rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(0,170,255,.12); border: 1px solid rgba(0,170,255,.25);
+      color: var(--blue); border-radius: 50px;
+      padding: .3rem .9rem; font-size: .78rem; font-weight: 600;
+      margin: .2rem;
+    }
+
+    /* ─── ABOUT PAGE ─── */
+    .about-hero {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+      align-items: center; padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .about-visual {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 20px; height: 340px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem; position: relative; overflow: hidden;
+    }
+    .about-visual::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,170,255,.08), rgba(255,184,0,.05));
+    }
+    .about-content h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem;
+    }
+    .about-content p { color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+    .values {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3rem;
+    }
+    .value-item {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem;
+    }
+    .value-item .v-icon { font-size: 1.5rem; margin-bottom: .6rem; }
+    .value-item h4 { font-family: 'Syne', sans-serif; font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .value-item p { font-size: .83rem; color: var(--muted); line-height: 1.6; }
+
+    .timeline { margin-top: 4rem; }
+    .timeline h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 2rem; }
+    .tl-item {
+      display: flex; gap: 1.5rem; padding-bottom: 2.5rem;
+      border-left: 2px solid var(--border); margin-left: 10px;
+      padding-left: 2rem; position: relative;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute; left: -7px; top: 0;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--blue);
+    }
+    .tl-year { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: var(--gold); min-width: 60px; }
+    .tl-text h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: .3rem; }
+    .tl-text p { font-size: .87rem; color: var(--muted); }
+
+    /* ─── CONTACT PAGE ─── */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 3rem;
+      align-items: start;
+    }
+    .contact-info h2 { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+    .contact-info p { color: var(--muted); line-height: 1.75; margin-bottom: 2rem; }
+    .contact-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .contact-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(0,170,255,.1); border: 1px solid rgba(0,170,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .contact-item h4 { font-family: 'Syne', sans-serif; font-size: .85rem; font-weight: 700; color: var(--muted); margin-bottom: .2rem; }
+    .contact-item p { font-size: .9rem; color: var(--text); }
+
+    .contact-form {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2.5rem;
+    }
+    .contact-form h3 { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: .82rem; font-weight: 500; color: var(--muted); margin-bottom: .5rem; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; background: var(--dark2);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; padding: .75rem 1rem;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .92rem;
+      outline: none; transition: border-color .2s;
+      resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
+    .form-group textarea { min-height: 120px; }
+    .btn-send {
+      width: 100%; background: linear-gradient(135deg, var(--blue), #006699);
+      color: #fff; border: none; border-radius: 50px;
+      padding: .9rem; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem; cursor: pointer;
+      transition: all .25s;
+    }
+    .btn-send:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,170,255,.4); }
+    .form-success {
+      display: none; background: rgba(0,200,100,.1);
+      border: 1px solid rgba(0,200,100,.3);
+      border-radius: 10px; padding: 1rem; text-align: center;
+      color: #00C864; font-weight: 500; margin-top: 1rem;
+    }
+
+    /* ─── SOCIAL BAR ─── */
+    .social-float {
+      position: fixed; right: 1.2rem; top: 50%; transform: translateY(-50%);
+      z-index: 90; display: flex; flex-direction: column; gap: .6rem;
+    }
+    .s-btn {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; text-decoration: none; color: #fff;
+      transition: transform .2s, box-shadow .2s;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .s-btn:hover { transform: scale(1.15) translateX(-4px); }
+    .s-fb   { background: #1877F2; }
+    .s-wa   { background: #25D366; }
+    .s-tt   { background: #010101; }
+    .s-ig   { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+    .s-li   { background: #0A66C2; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--dark2);
+      border-top: 1px solid var(--border);
+      padding: 3.5rem 5% 2rem;
+      position: relative; z-index: 1;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .footer-brand .brand-logo {
+      font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800;
+      text-decoration: none; cursor: pointer; display: inline-block; margin-bottom: .8rem;
+    }
+    .footer-brand .brand-logo span:first-child { color: var(--blue); }
+    .footer-brand .brand-logo span:last-child  { color: var(--gold); }
+    .footer-brand p { font-size: .87rem; color: var(--muted); line-height: 1.7; }
+    footer h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; margin-bottom: 1rem; color: var(--text); }
+    footer ul { list-style: none; }
+    footer ul li { margin-bottom: .5rem; }
+    footer ul li a {
+      font-size: .87rem; color: var(--muted);
+      text-decoration: none; cursor: pointer;
+      transition: color .2s;
+    }
+    footer ul li a:hover { color: var(--blue); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 1.5rem; border-top: 1px solid var(--border);
+      font-size: .82rem; color: var(--muted);
+      flex-wrap: wrap; gap: .5rem;
+    }
+    .footer-socials { display: flex; gap: .6rem; }
+    .footer-socials a {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; text-decoration: none; color: var(--muted);
+      transition: background .2s, color .2s;
+    }
+    .footer-socials a:hover { background: var(--blue); color: #fff; }
+
+    /* ─── CHATBOT ─── */
+    .chat-toggle {
+      position: fixed; bottom: 2rem; left: 2rem; z-index: 300;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), #0088CC);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: #fff;
+      box-shadow: 0 8px 30px rgba(0,170,255,.4);
+      transition: transform .25s, box-shadow .25s;
+    }
+    .chat-toggle:hover { transform: scale(1.08); box-shadow: 0 12px 40px rgba(0,170,255,.55); }
+    .chat-toggle.open { background: #e74c3c; }
+
+    .chatbot {
+      position: fixed; bottom: 6.5rem; left: 2rem; z-index: 299;
+      width: 340px; max-height: 480px;
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      transform: scale(.9) translateY(20px);
+      opacity: 0; pointer-events: none;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+    .chatbot.open {
+      opacity: 1; transform: scale(1) translateY(0);
+      pointer-events: all;
+    }
+    .chat-header {
+      background: linear-gradient(135deg, rgba(0,170,255,.2), rgba(0,136,204,.1));
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .chat-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .chat-header-info h4 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; }
+    .chat-header-info span { font-size: .75rem; color: #00C864; }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 1rem;
+      display: flex; flex-direction: column; gap: .75rem;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .msg {
+      max-width: 85%; padding: .65rem 1rem;
+      border-radius: 14px; font-size: .87rem; line-height: 1.5;
+      animation: msgIn .25s ease;
+    }
+    @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+    .msg.bot {
+      background: var(--dark2); border: 1px solid var(--border);
+      color: var(--text); border-bottom-left-radius: 4px; align-self: flex-start;
+    }
+    .msg.user {
+      background: linear-gradient(135deg, var(--blue), #0088CC);
+      color: #fff; border-bottom-right-radius: 4px; align-self: flex-end;
+    }
+    .quick-replies {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+      padding: .5rem 1rem;
+    }
+    .qr {
+      background: rgba(0,170,255,.1); border: 1px solid rgba(0,170,255,.25);
+      color: var(--blue); border-radius: 50px;
+      padding: .35rem .85rem; font-size: .78rem; font-weight: 500;
+      cursor: pointer; transition: background .2s;
+    }
+    .qr:hover { background: rgba(0,170,255,.25); }
+    .chat-input-row {
+      display: flex; gap: .5rem; padding: .75rem;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input {
+      flex: 1; background: var(--dark2); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 50px; padding: .6rem 1rem;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .85rem;
+      outline: none;
+    }
+    .chat-input:focus { border-color: var(--blue); }
+    .chat-send {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue); border: none; color: #fff;
+      font-size: 1rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      transition: transform .2s;
+    }
+    .chat-send:hover { transform: scale(1.1); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .nav-links.mobile-open {
+        display: flex; flex-direction: column;
+        position: fixed; inset: 0; top: 72px;
+        background: rgba(8,11,16,.97);
+        backdrop-filter: blur(20px);
+        align-items: center; justify-content: center;
+        gap: 2rem; z-index: 99;
+      }
+      .nav-links.mobile-open a { font-size: 1.4rem; }
+      .service-row, .about-hero, .contact-grid { grid-template-columns: 1fr; }
+      .service-row.reverse { direction: ltr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .social-float { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .values { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .chatbot { width: calc(100vw - 2rem); left: 1rem; }
+    }
+
+    /* Page header */
+    .page-header {
+      padding: 4rem 5% 2rem;
+      text-align: center;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,170,255,.1) 0%, transparent 70%);
+    }
+    .page-header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800;
+    }
+    .page-header h1 em { font-style: normal; color: var(--blue); }
+    .page-header p { color: var(--muted); margin-top: .75rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+    /* Scroll-reveal */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── How it works ─── */
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem; margin-top: 3rem; position: relative;
+    }
+    .step {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      position: relative;
+    }
+    .step-num {
+      font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800;
+      color: rgba(0,170,255,.15); line-height: 1; margin-bottom: .5rem;
+    }
+    .step h3 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: .5rem; }
+    .step p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
+
+    /* CTA band */
+    .cta-band {
+      margin: 0 5% 5rem;
+      background: linear-gradient(135deg, rgba(0,170,255,.15), rgba(255,184,0,.08));
+      border: 1px solid rgba(0,170,255,.2);
+      border-radius: 24px; padding: 3.5rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-band::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,170,255,.1), transparent 60%);
+    }
+    .cta-band h2 {
+      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+      margin-bottom: .75rem; position: relative;
+    }
+    .cta-band p { color: var(--muted); margin-bottom: 1.5rem; position: relative; }
+    .cta-band .hero-actions { margin-top: 0; }
+
+    /* Pricing badges */
+    .price-badge {
+      display: inline-flex; align-items: baseline; gap: .3rem;
+      margin-top: .75rem;
+    }
+    .price-num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--gold); }
+    .price-unit { font-size: .85rem; color: var(--muted); }
+
+    /* Testimonials */
+    .testimonials {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .testi {
+      background: var(--dark3); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem;
+    }
+    .testi-stars { color: var(--gold); font-size: .85rem; margin-bottom: .8rem; }
+    .testi p { font-size: .9rem; color: var(--muted); line-height: 1.7; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: .75rem; margin-top: 1.2rem; }
+    .testi-pic { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,170,255,.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+    .testi-name h5 { font-family: 'Syne', sans-serif; font-size: .9rem; font-weight: 700; }
+    .testi-name span { font-size: .78rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo" onclick="showPage('home')">
+    <span>TopTop</span><span>Go</span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a onclick="showPage('home')" class="active" data-page="home">Accueil</a></li>
+    <li><a onclick="showPage('team')" data-page="team">Notre Équipe</a></li>
+    <li><a onclick="showPage('services')" data-page="services">Produits & Services</a></li>
+    <li><a onclick="showPage('about')" data-page="about">À Propos</a></li>
+    <li><a onclick="showPage('contact')" data-page="contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showPage('contact')">Réserver maintenant</button>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════ HOME PAGE -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="road-lines"></div>
+    <div class="hero-tag"><span></span> N°1 du Covoiturage Premium</div>
+    <h1>Voyagez <em>ensemble,</em><br>allez <strong>plus loin.</strong></h1>
+    <p class="hero-sub">TopTopGo connecte conducteurs et passagers pour des trajets sûrs, économiques et écologiques. Votre mobilité, réinventée.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('services')">Découvrir nos offres</button>
+      <button class="btn-outline" onclick="showPage('contact')">Nous contacter</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">50K+</span><span class="stat-lbl">Utilisateurs actifs</span></div>
+      <div class="stat"><span class="stat-num">200+</span><span class="stat-lbl">Villes couvertes</span></div>
+      <div class="stat"><span class="stat-num">4.9★</span><span class="stat-lbl">Note moyenne</span></div>
+      <div class="stat"><span class="stat-num">2M+</span><span class="stat-lbl">Trajets effectués</span></div>
+    </div>
+  </div>
+
+  <div class="section reveal">
+    <div class="section-label">Pourquoi TopTopGo ?</div>
+    <div class="section-title">Tout ce dont vous avez<br>besoin pour <em>partir</em></div>
+    <div class="cards">
+      <div class="card"><div class="card-icon">🛡️</div><h3>Sécurité garantie</h3><p>Vérification d'identité, assurance trajets et évaluations communautaires pour chaque déplacement.</p></div>
+      <div class="card"><div class="card-icon gold">💰</div><h3>Économies réelles</h3><p>Divisez les frais de carburant et réduisez votre budget transport jusqu'à 75 % par rapport au taxi.</p></div>
+      <div class="card"><div class="card-icon">🌱</div><h3>Éco-responsable</h3><p>Moins de voitures sur la route, moins de CO₂. Chaque trajet partagé compte pour la planète.</p></div>
+      <div class="card"><div class="card-icon gold">⚡</div><h3>Réservation instantanée</h3><p>Trouvez un trajet en quelques secondes. Interface intuitive, confirmation immédiate.</p></div>
+      <div class="card"><div class="card-icon">📍</div><h3>Couverture nationale</h3><p>Plus de 200 villes connectées, trajets interurbains et liaison aéroport disponibles.</p></div>
+      <div class="card"><div class="card-icon gold">🤝</div><h3>Communauté bienveillante</h3><p>Un réseau de confiance avec système de notation et support client 24h/24.</p></div>
+    </div>
+  </div>
+
+  <div class="section reveal" style="background: var(--dark2); margin: 0; padding: 5rem 5%;">
+    <div class="section-label">Comment ça marche</div>
+    <div class="section-title">Simple en <em>3 étapes</em></div>
+    <div class="steps">
+      <div class="step"><div class="step-num">01</div><h3>Créez votre profil</h3><p>Inscrivez-vous gratuitement, vérifiez votre identité et complétez votre profil en 2 minutes.</p></div>
+      <div class="step"><div class="step-num">02</div><h3>Trouvez ou proposez</h3><p>Recherchez un trajet disponible ou publiez le vôtre avec vos horaires et tarifs.</p></div>
+      <div class="step"><div class="step-num">03</div><h3>Voyagez & notez</h3><p>Rencontrez-vous au point de départ, voyagez ensemble et partagez votre expérience.</p></div>
+    </div>
+  </div>
+
+  <div class="section reveal">
+    <div class="section-label">Témoignages</div>
+    <div class="section-title">Ce que disent <em>nos membres</em></div>
+    <div class="testimonials">
+      <div class="testi"><div class="testi-stars">★★★★★</div><p>« TopTopGo a changé ma vie professionnelle. Je fais Paris–Lyon tous les lundis sans stress ni dépenses folles. »</p><div class="testi-author"><div class="testi-pic">👨‍💼</div><div class="testi-name"><h5>Marc Dubois</h5><span>Consultant, Paris</span></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p>« Super application, interface claire et les conducteurs sont tous sympas. Je recommande à 100 % ! »</p><div class="testi-author"><div class="testi-pic">👩‍🎓</div><div class="testi-name"><h5>Aïcha Konaté</h5><span>Étudiante, Lyon</span></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p>« En tant que conducteur, je couvre mes frais de carburant chaque semaine. Une vraie bonne idée. »</p><div class="testi-author"><div class="testi-pic">🚗</div><div class="testi-name"><h5>Thomas Renard</h5><span>Conducteur régulier, Bordeaux</span></div></div></div>
+    </div>
+  </div>
+
+  <div class="cta-band reveal">
+    <h2>Prêt à <em style="color:var(--gold);font-style:normal">rejoindre</em> l'aventure ?</h2>
+    <p>Inscrivez-vous gratuitement et bénéficiez de votre premier trajet offert.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('contact')">Commencer maintenant</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ TEAM PAGE -->
+<section class="page" id="page-team">
+  <div class="page-header">
+    <div class="section-label">Notre ADN</div>
+    <h1>Une équipe <em>passionnée</em></h1>
+    <p>Des talents réunis autour d'une vision commune : révolutionner la mobilité partagée.</p>
+  </div>
+
+  <div class="section reveal">
+    <div class="section-label">Direction</div>
+    <div class="section-title">Les <em>fondateurs</em></div>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-avatar" style="background:rgba(0,170,255,.1)">👨‍💼</div><h3>Amadou Traoré</h3><div class="role">CEO & Co-fondateur</div><p>Visionnaire de la mobilité durable. 10 ans d'expérience dans les transports et la tech africaine.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(255,184,0,.1)">👩‍💻</div><h3>Fatima Diallo</h3><div class="role">CTO & Co-fondatrice</div><p>Ingénieure full-stack passionnée. Architecte de la plateforme TopTopGo depuis le premier jour.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(0,200,100,.1)">👨‍🎨</div><h3>Kevin Mensah</h3><div class="role">CMO – Marketing</div><p>Spécialiste en growth hacking et branding. Il a propulsé TopTopGo vers 50 000 utilisateurs.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(200,0,255,.1)">👩‍⚖️</div><h3>Sylvie Nkembo</h3><div class="role">Directrice Juridique</div><p>Experte en droit du numérique et conformité réglementaire sur les marchés africains et européens.</p></div>
+    </div>
+  </div>
+
+  <div class="section reveal" style="background:var(--dark2); margin:0; padding:5rem 5%">
+    <div class="section-label">Équipes opérationnelles</div>
+    <div class="section-title">Des experts <em>dédiés</em></div>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-avatar" style="background:rgba(0,170,255,.1)">🛡️</div><h3>Ibrahim Coulibaly</h3><div class="role">Responsable Sécurité</div><p>Veille à la sécurité des trajets et à la vérification des utilisateurs sur toute la plateforme.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(255,184,0,.1)">📊</div><h3>Mariame Touré</h3><div class="role">Data Analyst</div><p>Analyse les données pour optimiser les algorithmes de mise en relation et l'expérience utilisateur.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(0,200,100,.1)">🎧</div><h3>Romaric Gbessi</h3><div class="role">Support Client</div><p>Chef de l'équipe support, il garantit une réponse rapide et efficace à chaque membre.</p></div>
+      <div class="team-card"><div class="team-avatar" style="background:rgba(255,100,0,.1)">🤝</div><h3>Nadia Sow</h3><div class="role">Partenariats</div><p>Développe les accords avec entreprises, mairies et acteurs de la mobilité pour étendre notre réseau.</p></div>
+    </div>
+  </div>
+
+  <div class="cta-band reveal" style="margin-top:0">
+    <h2>Rejoignez <em style="color:var(--blue);font-style:normal">notre équipe</em></h2>
+    <p>Nous recrutons des talents passionnés pour notre mission. Consultez nos offres d'emploi.</p>
+    <div class="hero-actions"><button class="btn-primary" onclick="showPage('contact')">Postuler maintenant</button></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ SERVICES PAGE -->
+<section class="page" id="page-services">
+  <div class="page-header">
+    <div class="section-label">Ce que nous offrons</div>
+    <h1>Produits &amp; <em>Services</em></h1>
+    <p>Des solutions de mobilité adaptées à chaque besoin, particulier ou entreprise.</p>
+  </div>
+
+  <div class="section reveal">
+    <div class="service-row">
+      <div class="service-visual">🚗</div>
+      <div class="service-content">
+        <div class="section-label">Particuliers</div>
+        <h3>Covoiturage Quotidien</h3>
+        <p>Partagez votre voiture pour vos trajets domicile-travail ou vos voyages longue distance. Économisez sur le carburant, réduisez le trafic et rencontrez de nouvelles personnes.</p>
+        <div class="price-badge"><span class="price-num">Dès 3€</span><span class="price-unit">/ trajet</span></div>
+        <div style="margin-top:1rem">
+          <span class="badge">🛡️ Assurance incluse</span>
+          <span class="badge">📱 App mobile</span>
+          <span class="badge">💳 Paiement sécurisé</span>
+        </div>
+      </div>
+    </div>
+    <div class="service-row reverse">
+      <div class="service-visual">🏢</div>
+      <div class="service-content">
+        <div class="section-label">Entreprises</div>
+        <h3>TopTopGo Business</h3>
+        <p>Offrez à vos collaborateurs une solution de mobilité professionnelle. Tableau de bord entreprise, reporting CO₂, facturation centralisée et tarifs préférentiels.</p>
+        <div class="price-badge"><span class="price-num">Sur devis</span></div>
+        <div style="margin-top:1rem">
+          <span class="badge">📊 Dashboard RH</span>
+          <span class="badge">🌿 Bilan carbone</span>
+          <span class="badge">🏷️ Tarifs groupés</span>
+        </div>
+      </div>
+    </div>
+    <div class="service-row">
+      <div class="service-visual">✈️</div>
+      <div class="service-content">
+        <div class="section-label">Voyages</div>
+        <h3>Transferts Aéroports</h3>
+        <p>Besoin d'un transfert vers l'aéroport ou la gare ? Réservez à l'avance, profitez d'un tarif fixe et d'un chauffeur ponctuel. Zéro surprise, confort total.</p>
+        <div class="price-badge"><span class="price-num">Dès 15€</span><span class="price-unit">/ transfert</span></div>
+        <div style="margin-top:1rem">
+          <span class="badge">⏰ Ponctualité garantie</span>
+          <span class="badge">🧳 Bagages inclus</span>
+          <span class="badge">📞 Suivi en temps réel</span>
+        </div>
+      </div>
+    </div>
+    <div class="service-row reverse">
+      <div class="service-visual">🎓</div>
+      <div class="service-content">
+        <div class="section-label">Étudiants</div>
+        <h3>TopTopGo Student</h3>
+        <p>Programme spécial étudiant avec tarifs réduits, abonnement mensuel et réseau communautaire universitaire. La mobilité sans se ruiner.</p>
+        <div class="price-badge"><span class="price-num">9,90€</span><span class="price-unit">/ mois</span></div>
+        <div style="margin-top:1rem">
+          <span class="badge">🎓 Vérification étudiante</span>
+          <span class="badge">🔁 Trajets illimités</span>
+          <span class="badge">👥 Réseau campus</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section reveal" style="background:var(--dark2); margin:0; padding:5rem 5%">
+    <div class="section-label">Notre App</div>
+    <div class="section-title">Disponible sur <em>iOS & Android</em></div>
+    <div class="cards" style="margin-top:2rem">
+      <div class="card"><div class="card-icon">🗺️</div><h3>Navigation temps réel</h3><p>Suivi GPS du trajet, alertes de départ et communication directe avec le conducteur.</p></div>
+      <div class="card"><div class="card-icon gold">🔔</div><h3>Notifications push</h3><p>Confirmations, rappels et mises à jour de trajet instantanées pour ne rien manquer.</p></div>
+      <div class="card"><div class="card-icon">💬</div><h3>Messagerie intégrée</h3><p>Échangez avec votre conducteur ou passager de façon sécurisée avant et pendant le trajet.</p></div>
+      <div class="card"><div class="card-icon gold">⭐</div><h3>Système de notation</h3><p>Évaluez chaque trajet et contribuez à construire une communauté de confiance.</p></div>
+    </div>
+  </div>
+
+  <div class="cta-band reveal" style="margin-top:0">
+    <h2>Vous êtes une <em style="color:var(--gold);font-style:normal">entreprise</em> ?</h2>
+    <p>Contactez notre équipe commerciale pour un devis personnalisé TopTopGo Business.</p>
+    <div class="hero-actions"><button class="btn-primary" onclick="showPage('contact')">Demander un devis</button></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ABOUT PAGE -->
+<section class="page" id="page-about">
+  <div class="page-header">
+    <div class="section-label">Notre Histoire</div>
+    <h1>À <em>propos</em> de nous</h1>
+    <p>Née d'une conviction simple : se déplacer ensemble, c'est aller plus loin.</p>
+  </div>
+
+  <div class="section reveal">
+    <div class="about-hero">
+      <div class="about-visual">🌍</div>
+      <div class="about-content">
+        <h2>Nous croyons en une <em style="color:var(--blue)">mobilité</em> pour tous</h2>
+        <p>TopTopGo est née en 2021 de la frustration de deux fondateurs face à la congestion urbaine et au coût exorbitant des transports. Notre mission : créer un réseau de covoiturage fiable, sûr et accessible à tous.</p>
+        <p>Aujourd'hui, nous sommes présents dans 15 pays, avec plus de 50 000 membres actifs qui partagent chaque jour des milliers de trajets. Notre technologie connecte les bonnes personnes au bon moment.</p>
+        <p>Nous sommes convaincus que la mobilité de demain sera partagée, durable et humaine. Et nous la construisons dès aujourd'hui.</p>
+        <div class="hero-actions" style="margin-top:1.5rem; justify-content:flex-start">
+          <button class="btn-primary" onclick="showPage('team')">Rencontrer l'équipe</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="values">
+      <div class="value-item"><div class="v-icon">🌿</div><h4>Durabilité</h4><p>Réduire l'empreinte carbone de chaque trajet est au cœur de notre développement produit.</p></div>
+      <div class="value-item"><div class="v-icon">🤝</div><h4>Confiance</h4><p>Vérification des identités, assurance et système de notation transparent pour tous.</p></div>
+      <div class="value-item"><div class="v-icon">⚡</div><h4>Innovation</h4><p>Algorithmes IA, matching en temps réel et interface toujours améliorée.</p></div>
+      <div class="value-item"><div class="v-icon">🌏</div><h4>Inclusion</h4><p>Des tarifs accessibles et une couverture étendue pour que personne ne soit laissé de côté.</p></div>
+    </div>
+  </div>
+
+  <div class="section reveal" style="background:var(--dark2); margin:0; padding:5rem 5%">
+    <div class="timeline">
+      <div class="section-label">Chronologie</div>
+      <div class="section-title">Notre <em>parcours</em></div>
+      <div style="margin-top:2.5rem">
+        <div class="tl-item"><div class="tl-year">2021</div><div class="tl-text"><h4>Création de TopTopGo</h4><p>Lancement de la plateforme beta avec 200 utilisateurs fondateurs dans 3 villes.</p></div></div>
+        <div class="tl-item"><div class="tl-year">2022</div><div class="tl-text"><h4>Levée de fonds Série A</h4><p>2,5 millions d'euros levés pour accélérer le développement technique et l'expansion.</p></div></div>
+        <div class="tl-item"><div class="tl-year">2023</div><div class="tl-text"><h4>Expansion internationale</h4><p>Déploiement dans 8 nouveaux pays avec 25 000 utilisateurs actifs et lancement de l'app mobile.</p></div></div>
+        <div class="tl-item"><div class="tl-year">2024</div><div class="tl-text"><h4>TopTopGo Business</h4><p>Lancement de l'offre entreprise, 150 contrats signés avec des PME et grandes entreprises.</p></div></div>
+        <div class="tl-item" style="padding-bottom:0"><div class="tl-year">2025</div><div class="tl-text"><h4>50 000 membres & 15 pays</h4><p>Franchise Afrique de l'Ouest, 2 millions de trajets effectués, Cap vers l'Europe.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section reveal">
+    <div class="section-label">Nos engagements</div>
+    <div class="section-title">Impact <em>concret</em></div>
+    <div class="cards">
+      <div class="card"><div class="card-icon">🌿</div><h3>2 500 tonnes de CO₂</h3><p>Évitées grâce aux trajets partagés sur notre plateforme depuis 2021.</p></div>
+      <div class="card"><div class="card-icon gold">💰</div><h3>3,2 M€ économisés</h3><p>Par nos membres sur leurs frais de transport en 4 ans d'activité.</p></div>
+      <div class="card"><div class="card-icon">🛣️</div><h3>4,8 M km partagés</h3><p>De routes parcourues en covoiturage, soit 120 tours du monde.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CONTACT PAGE -->
+<section class="page" id="page-contact">
+  <div class="page-header">
+    <div class="section-label">On est là</div>
+    <h1>Contactez-<em>nous</em></h1>
+    <p>Une question, un partenariat ou une réclamation ? Nous répondons en moins de 24h.</p>
+  </div>
+
+  <div class="section reveal">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h2>Parlons de votre <em style="color:var(--blue)">projet</em></h2>
+        <p>Que vous soyez particulier, entreprise ou collectivité, notre équipe est disponible pour vous accompagner dans votre démarche de mobilité partagée.</p>
+
+        <div class="contact-item"><div class="contact-icon">📍</div><div><h4>Siège social</h4><p>123 Avenue de la Mobilité, Abidjan, Côte d'Ivoire</p></div></div>
+        <div class="contact-item"><div class="contact-icon">📞</div><div><h4>Téléphone</h4><p>+225 07 00 00 00 00</p></div></div>
+        <div class="contact-item"><div class="contact-icon">✉️</div><div><h4>Email</h4><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f89b97968c999b8cb88c97888c97889f97d69b9795">[email&#160;protected]</a></p></div></div>
+        <div class="contact-item"><div class="contact-icon">🕐</div><div><h4>Horaires</h4><p>Lun–Ven : 8h–18h · Support 24h/24 via l'app</p></div></div>
+
+        <div style="margin-top:2rem">
+          <h4 style="font-family:'Syne',sans-serif; font-weight:700; margin-bottom:1rem;">Suivez-nous</h4>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+            <a href="https://facebook.com" target="_blank" class="s-btn s-fb" title="Facebook">&#xf09a;</a>
+            <a href="https://wa.me/2250700000000" target="_blank" class="s-btn s-wa" title="WhatsApp">💬</a>
+            <a href="https://tiktok.com" target="_blank" class="s-btn s-tt" title="TikTok">🎵</a>
+            <a href="https://instagram.com" target="_blank" class="s-btn s-ig" title="Instagram">📸</a>
+            <a href="https://linkedin.com" target="_blank" class="s-btn s-li" title="LinkedIn">in</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <h3>Envoyer un message ✉️</h3>
+        <div class="form-row">
+          <div class="form-group"><label>Prénom</label><input type="text" id="cf-prenom" placeholder="Jean"/></div>
+          <div class="form-group"><label>Nom</label><input type="text" id="cf-nom" placeholder="Dupont"/></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="cf-email" placeholder="jean@email.com"/></div>
+        <div class="form-group"><label>Objet</label>
+          <select id="cf-objet">
+            <option value="">Sélectionnez un objet</option>
+            <option>Demande d'information</option>
+            <option>Partenariat entreprise</option>
+            <option>Support technique</option>
+            <option>Signalement</option>
+            <option>Presse / Médias</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Message</label><textarea id="cf-msg" placeholder="Votre message ici..."></textarea></div>
+        <button class="btn-send" onclick="sendForm()">Envoyer le message 🚀</button>
+        <div class="form-success" id="formSuccess">✅ Message envoyé ! Nous vous répondrons dans les 24h.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section reveal" style="background:var(--dark2); margin:0; padding:5rem 5%">
+    <div class="section-label">FAQ</div>
+    <div class="section-title">Questions <em>fréquentes</em></div>
+    <div class="cards" style="margin-top:2rem">
+      <div class="card"><h3>Comment m'inscrire ?</h3><p>Téléchargez l'app TopTopGo, entrez votre email ou numéro de téléphone et suivez les étapes de vérification.</p></div>
+      <div class="card"><h3>Comment fonctionne le paiement ?</h3><p>Le paiement est 100 % en ligne, sécurisé par notre partenaire. Le conducteur reçoit sa participation après confirmation du trajet.</p></div>
+      <div class="card"><h3>Que faire en cas de problème ?</h3><p>Contactez notre support via le chat intégré ou envoyez-nous un email. Nous intervenons sous 1 heure.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="brand-logo" onclick="showPage('home')">
+        <span>TopTop</span><span>Go</span>
+      </div>
+      <p>La solution de covoiturage premium qui connecte les voyageurs et les conducteurs pour une mobilité durable et économique.</p>
+    </div>
+    <div>
+      <h4>Navigation</h4>
+      <ul>
+        <li><a onclick="showPage('home')">Accueil</a></li>
+        <li><a onclick="showPage('team')">Notre équipe</a></li>
+        <li><a onclick="showPage('services')">Services</a></li>
+        <li><a onclick="showPage('about')">À propos</a></li>
+        <li><a onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Services</h4>
+      <ul>
+        <li><a onclick="showPage('services')">Covoiturage quotidien</a></li>
+        <li><a onclick="showPage('services')">TopTopGo Business</a></li>
+        <li><a onclick="showPage('services')">Transferts aéroports</a></li>
+        <li><a onclick="showPage('services')">Offre étudiante</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Légal</h4>
+      <ul>
+        <li><a href="#">Mentions légales</a></li>
+        <li><a href="#">Politique de confidentialité</a></li>
+        <li><a href="#">CGU</a></li>
+        <li><a href="#">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 TopTopGo. Tous droits réservés.</span>
+    <div class="footer-socials">
+      <a href="https://facebook.com" target="_blank" title="Facebook">f</a>
+      <a href="https://wa.me/2250700000000" target="_blank" title="WhatsApp">w</a>
+      <a href="https://tiktok.com" target="_blank" title="TikTok">t</a>
+      <a href="https://instagram.com" target="_blank" title="Instagram">ig</a>
+      <a href="https://linkedin.com" target="_blank" title="LinkedIn">in</a>
+    </div>
+  </div>
+</footer>
+
+<!-- SOCIAL FLOAT -->
+<div class="social-float">
+  <a href="https://facebook.com" target="_blank" class="s-btn s-fb" title="Facebook">f</a>
+  <a href="https://wa.me/2250700000000" target="_blank" class="s-btn s-wa" title="WhatsApp">💬</a>
+  <a href="https://tiktok.com" target="_blank" class="s-btn s-tt" title="TikTok">🎵</a>
+  <a href="https://instagram.com" target="_blank" class="s-btn s-ig" title="Instagram">📸</a>
+  <a href="https://linkedin.com" target="_blank" class="s-btn s-li" title="LinkedIn">in</a>
+</div>
+
+<!-- CHATBOT -->
+<button class="chat-toggle" id="chatToggle" onclick="toggleChat()">💬</button>
+<div class="chatbot" id="chatbot">
+  <div class="chat-header">
+    <div class="chat-avatar">🚗</div>
+    <div class="chat-header-info">
+      <h4>Assistant TopTopGo</h4>
+      <span>● En ligne maintenant</span>
+    </div>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg bot">Bonjour ! 👋 Je suis l'assistant TopTopGo. Comment puis-je vous aider aujourd'hui ?</div>
+  </div>
+  <div class="quick-replies" id="quickReplies">
+    <div class="qr" onclick="qr('Comment m\'inscrire ?')">S\'inscrire</div>
+    <div class="qr" onclick="qr('Quels sont vos tarifs ?')">Tarifs</div>
+    <div class="qr" onclick="qr('Comment fonctionne le covoiturage ?')">Comment ça marche</div>
+    <div class="qr" onclick="qr('Je veux un trajet aéroport')">Aéroport</div>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatInput" placeholder="Écrivez un message…" onkeydown="if(event.key==='Enter') sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">➤</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ─── PAGE ROUTING ───
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.dataset.page === id);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // close mobile menu
+    document.getElementById('navLinks').classList.remove('mobile-open');
+    document.getElementById('hamburger').classList.remove('open');
+    // trigger reveal
+    setTimeout(initReveal, 100);
+  }
+
+  // ─── HAMBURGER ───
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('navLinks').classList.toggle('mobile-open');
+  }
+
+  // ─── SCROLL REVEAL ───
+  function initReveal() {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => { el.classList.remove('visible'); obs.observe(el); });
+  }
+  initReveal();
+
+  // ─── CHATBOT ───
+  const responses = {
+    'inscrire': "Pour vous inscrire, téléchargez l'app TopTopGo (iOS ou Android), entrez votre numéro de téléphone ou email, puis vérifiez votre identité. C'est gratuit ! 🎉",
+    'tarif': "Nos tarifs débutent à 3€ le trajet pour les particuliers. L'offre étudiante est à 9,90€/mois, et les transferts aéroports à partir de 15€. Besoin d'un devis entreprise ? 🏢",
+    'comment': "C'est simple en 3 étapes :\n1️⃣ Créez votre profil\n2️⃣ Trouvez ou publiez un trajet\n3️⃣ Voyagez et notez votre expérience !",
+    'aéroport': "Nos transferts aéroports débutent à 15€. Réservez à l'avance sur notre app, choisissez votre date/heure et un conducteur confirmé vous prendra en charge. ✈️",
+    'sécurité': "Nous vérifions l'identité de tous nos membres, proposons une assurance trajet incluse et un système de notation communautaire pour garantir votre sécurité. 🛡️",
+    'contact': "Vous pouvez nous joindre au +225 07 00 00 00 00 ou par email à contact@toptopgo.com. Notre support répond sous 24h. 📞",
+    'default': "Merci pour votre message ! 😊 Pour une réponse détaillée, vous pouvez nous contacter directement via notre page Contact ou au +225 07 00 00 00 00."
+  };
+
+  function getResponse(msg) {
+    const m = msg.toLowerCase();
+    if (m.includes('inscrire') || m.includes('inscription') || m.includes('créer')) return responses.inscrire;
+    if (m.includes('tarif') || m.includes('prix') || m.includes('coût') || m.includes('combien')) return responses.tarif;
+    if (m.includes('fonctionn') || m.includes('comment') || m.includes('marche')) return responses.comment;
+    if (m.includes('aéroport') || m.includes('transfert') || m.includes('airport')) return responses.aéroport;
+    if (m.includes('sécurité') || m.includes('sûr') || m.includes('confiance')) return responses.sécurité;
+    if (m.includes('contact') || m.includes('téléphone') || m.includes('email')) return responses.contact;
+    return responses.default;
+  }
+
+  function addMsg(text, type) {
+    const m = document.createElement('div');
+    m.className = 'msg ' + type;
+    m.textContent = text;
+    document.getElementById('chatMessages').appendChild(m);
+    document.getElementById('chatMessages').scrollTop = 999999;
+  }
+
+  function sendChat() {
+    const inp = document.getElementById('chatInput');
+    const val = inp.value.trim();
+    if (!val) return;
+    addMsg(val, 'user');
+    inp.value = '';
+    document.getElementById('quickReplies').style.display = 'none';
+    setTimeout(() => addMsg(getResponse(val), 'bot'), 700);
+  }
+
+  function qr(text) {
+    addMsg(text, 'user');
+    document.getElementById('quickReplies').style.display = 'none';
+    setTimeout(() => addMsg(getResponse(text), 'bot'), 700);
+  }
+
+  function toggleChat() {
+    const bot = document.getElementById('chatbot');
+    const btn = document.getElementById('chatToggle');
+    bot.classList.toggle('open');
+    btn.classList.toggle('open');
+    btn.textContent = bot.classList.contains('open') ? '✕' : '💬';
+  }
+
+  // ─── CONTACT FORM ───
+  function sendForm() {
+    const prenom = document.getElementById('cf-prenom').value;
+    const nom = document.getElementById('cf-nom').value;
+    const email = document.getElementById('cf-email').value;
+    const msg = document.getElementById('cf-msg').value;
+    if (!prenom || !email || !msg) { alert('Veuillez remp
