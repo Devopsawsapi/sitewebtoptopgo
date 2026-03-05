@@ -942,7 +942,7 @@
 
         <div class="contact-item"><div class="contact-icon">📍</div><div><h4>Siège social</h4><p>123 Avenue de la Mobilité, Abidjan, Côte d'Ivoire</p></div></div>
         <div class="contact-item"><div class="contact-icon">📞</div><div><h4>Téléphone</h4><p>+225 07 00 00 00 00</p></div></div>
-        <div class="contact-item"><div class="contact-icon">✉️</div><div><h4>Email</h4><p><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f89b97968c999b8cb88c97888c97889f97d69b9795">[email&#160;protected]</a></p></div></div>
+        <div class="contact-item"><div class="contact-icon">✉️</div><div><h4>Email</h4><p>contact@toptopgo.com</p></div></div>
         <div class="contact-item"><div class="contact-icon">🕐</div><div><h4>Horaires</h4><p>Lun–Ven : 8h–18h · Support 24h/24 via l'app</p></div></div>
 
         <div style="margin-top:2rem">
@@ -1077,7 +1077,7 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   // ─── PAGE ROUTING ───
   function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1168,4 +1168,10 @@
     const nom = document.getElementById('cf-nom').value;
     const email = document.getElementById('cf-email').value;
     const msg = document.getElementById('cf-msg').value;
-    if (!prenom || !email || !msg) { alert('Veuillez remp
+    if (!prenom || !email || !msg) { alert('Veuillez remplir les champs obligatoires.'); return; }
+    document.getElementById('formSuccess').style.display = 'block';
+    setTimeout(() => document.getElementById('formSuccess').style.display = 'none', 4000);
+  }
+</script>
+</body>
+</html>
